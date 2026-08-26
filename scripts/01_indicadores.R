@@ -22,8 +22,6 @@ comtrade <- comtrade %>%
   rename(value = tradevaluein1000usd) %>%
   select(r, p, flow, cuci, cuci_desc, value, year)
 
-view(comtrade)
-
 comtrade_2 <- comtrade |>
   mutate(value = value / 1000)
 
@@ -45,9 +43,43 @@ df_share <- comtrade_exp |>
 
 vcr_aux_mar <- df_share |>
   filter(r == "MAR", p == "WLD") |>
-  rename(share_mys = share)
+  rename(share_mar = share)
 
-#NOTA: VER CÓMO SEGUIR SOLO PARA MARRUECOS
+#AHORA TODA LA PARTE DE WLD-WLD
 
+comtrade_wld <- read_dta("WLD_WLD.dta")
+
+names(comtrade_wld) <- tolower(names(comtrade_wld))
+
+comtrade_wld <- comtrade_wld %>%
+  mutate(
+    cuci = as.character(as_factor(productcode)),
+    r    = as.character(as_factor(reporteriso3)),
+    p    = as.character(as_factor(partneriso3)),
+    flow = as.character(as_factor(tradeflowname))
+  ) %>%
+  rename(value = tradevaluein1000usd) %>%
+  select(r, p, flow, cuci, value, year)
+
+wld_exp <- comtrade_wld |>
+  filter(flow == "Export", r == "All", p == "All") |>
+  group_by(year) |>
+  mutate(total_wld = sum(value, na.rm = TRUE)) |>
+  ungroup() |>
+  mutate(share_wld = value / total_wld) |>
+  select(year, cuci, share_wld)
+
+vcr_mar <- vcr_aux_mar |>
+  select(year, cuci, cuci_desc, share_mar) |>
+  left_join(wld_exp, by = c("year", "cuci")) |>
+  mutate(
+    vcr  = share_mar / share_wld,
+    vcrn = (vcr - 1) / (vcr + 1)
+  ) |>
+  arrange(desc(vcr))
+
+sum(is.na(vcr_mar$share_wld))
+
+view(vcr_mar)
 
 
