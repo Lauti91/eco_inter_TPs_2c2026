@@ -23,3 +23,31 @@ comtrade <- comtrade %>%
   select(r, p, flow, cuci, cuci_desc, value, year)
 
 view(comtrade)
+
+comtrade_2 <- comtrade |>
+  mutate(value = value / 1000)
+
+#VCR 
+
+comtrade_exp <- comtrade_2 |>
+  filter(flow == "Export")
+
+comtrade_exp <- comtrade_exp |>
+  group_by(year, r, p) |>
+  mutate(total_expo = sum(value, na.rm = TRUE)) |>
+  ungroup()
+
+comtrade_exp <- comtrade_exp |>
+  mutate(share = value / total_expo)
+
+df_share <- comtrade_exp |>
+  select(year, r, p, cuci, cuci_desc, share)
+
+vcr_aux_mar <- df_share |>
+  filter(r == "MAR", p == "WLD") |>
+  rename(share_mys = share)
+
+#NOTA: VER CÓMO SEGUIR SOLO PARA MARRUECOS
+
+
+
