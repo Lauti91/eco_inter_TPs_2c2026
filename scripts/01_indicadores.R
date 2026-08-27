@@ -475,3 +475,6 @@ ggsave(
   bg = "white"          # evita que quede con fondo transparente
 )
 
+
+
+
