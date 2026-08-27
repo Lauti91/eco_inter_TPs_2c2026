@@ -301,3 +301,17 @@ ggplot(cruce_vcr_iic_vol_recortado, aes(x = vcrn, y = iic)) +
   )
 
 ggsave("bubble_vcr_iic_espana.png", width = 11, height = 7, dpi = 300, bg = "white")
+
+ultimo_grafico <- last_plot()
+
+ggsave(
+  filename = "bubble_iic_vcr_esp.png",
+  plot = ultimo_grafico,
+  width = 10, height = 6.5,
+  dpi = 300,          
+  bg = "white"          
+)
+
+#ARREGLAR GRAFICO: QUE LAS BURBUJAS SEAN TRANSPARENTES, REPOSICIONAR
+#LAS REFERENCIAS Y AGREGAR OTROS SECTORES DE EXPORTACIÓN (MARRUECOS TIENE UNA
+#CRECIENTE INDUSTRIA ENSANMBLADORA DE AUTOPARTES) 
