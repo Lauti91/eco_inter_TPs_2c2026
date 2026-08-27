@@ -475,5 +475,176 @@ ggsave(
 
 
 
+# otro grafico pero esta vez haciendo interactuar VCR con ICC
+
+icc_prod_esp_2024 <- calcular_icc_producto("ESP", 2024) |> mutate(socio = "España")
+icc_prod_fra_2024 <- calcular_icc_producto("FRA", 2024) |> mutate(socio = "Francia")
+
+cruce_vcr_icc <- vcr_mar |>
+  filter(year == 2024) |>
+  select(cuci, vcrn) |>
+  inner_join(bind_rows(icc_prod_esp_2024, icc_prod_fra_2024), by = "cuci") |>
+  filter(m > 0.001 | x > 0.001)  # sacamos los matches triviales entre ceros
+
+ggplot(cruce_vcr_icc, aes(x = vcrn, y = icc_k)) +
+  geom_point(alpha = 0.5, color = "darkorange") +
+  geom_hline(yintercept = 50, linetype = "dashed", color = "gray50") +
+  facet_wrap(~socio) +
+  labs(title = "VCR de Marruecos vs. complementariedad sectorial (ICC por producto)",
+       subtitle = "2024 · España vs. Francia",
+       x = "VCRN", y = "ICC por producto (0-100)") +
+  theme_minimal()
+
+# cruce completo
+
+cruce_completo <- cruce_vcr_iic |>
+  left_join(
+    comtrade_exp |> filter(r == "MAR", p == "ESP", year == 2024) |> select(cuci, value),
+    by = "cuci"
+  ) |>
+  filter(!is.na(value), value > 0)
+
+ggplot(cruce_completo, aes(x = vcrn, y = iic, size = value)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  scale_size_continuous(range = c(1, 15), labels = scales::label_number(suffix = "k US$")) +
+  scale_y_log10() +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  labs(title = "VCR, IIC y volumen exportado — Marruecos hacia España",
+       subtitle = "2024 · el tamaño del punto es el valor exportado",
+       x = "VCRN", y = "IIC (escala log)", size = "Exportaciones\n(miles US$)") +
+  theme_minimal()
 
 
+#--------------------------------------------------#
+
+cruce_vcr_iic_vol <- cruce_vcr_iic |>
+  left_join(
+    comtrade_exp |> 
+      filter(r == "MAR", p == "ESP", year == 2024) |> 
+      select(cuci, value),
+    by = "cuci"
+  ) |>
+  filter(!is.na(value), value > 0)
+
+destacados_vol <- cruce_vcr_iic_vol |>
+  filter(cuci %in% c("562", "272", "842", "773", "522"))
+
+ggplot(cruce_vcr_iic_vol, aes(x = vcrn, y = iic)) +
+  annotate("rect", xmin = 0, xmax = Inf, ymin = 1, ymax = Inf,
+           fill = "steelblue", alpha = 0.06) +
+  annotate("rect", xmin = 0, xmax = Inf, ymin = 0, ymax = 1,
+           fill = "firebrick", alpha = 0.06) +
+  geom_point(aes(size = value), alpha = 0.35, color = "gray40") +
+  geom_point(data = destacados_vol, aes(size = value, color = cuci_desc)) +
+  geom_text_repel(
+    data = destacados_vol, aes(label = cuci_desc, color = cuci_desc),
+    size = 3.5, fontface = "bold", show.legend = FALSE,
+    box.padding = 0.8, point.padding = 0.4,
+    segment.color = "gray50", min.segment.length = 0
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray40", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.4) +
+  scale_y_log10(labels = scales::label_number(accuracy = 0.01)) +
+  scale_size_continuous(range = c(1, 14), 
+                         labels = scales::label_number(suffix = "k US$"),
+                         guide = guide_legend(override.aes = list(color = "gray40", alpha = 0.5))) +
+  scale_color_brewer(palette = "Set1") +
+  guides(color = "none") +  # ya están etiquetados con texto, no hace falta leyenda de color
+  labs(
+    title = "Ventaja comparativa global, intensidad bilateral y volumen — Marruecos hacia España",
+    subtitle = "2024 · el tamaño del punto es el valor exportado a España",
+    x = "VCRN — ventaja comparativa revelada normalizada",
+    y = "IIC (escala log)",
+    size = "Exportaciones\n(miles US$)",
+    caption = "Línea punteada horizontal: IIC = 1 (comercio ni más ni menos intenso de lo esperado)\nLínea punteada vertical: VCRN = 0 (frontera entre ventaja y desventaja comparativa)"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray30", size = 11),
+    plot.caption = element_text(color = "gray50", size = 8, hjust = 0),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray92")
+  )
+
+#------------------------------------#
+
+cruce_vcr_iic_vol <- cruce_vcr_iic |>
+  left_join(
+    comtrade_exp |> 
+      filter(r == "MAR", p == "ESP", year == 2024) |> 
+      select(cuci, value),
+    by = "cuci"
+  ) |>
+  filter(!is.na(value), value > 0)
+
+destacados_vol <- cruce_vcr_iic_vol |>
+  filter(cuci %in% c("562", "272", "842", "773", "522"))
+
+#exluyo valores atipicos
+
+# Guardamos cuántos se excluyen, para poder mencionarlo como nota al pie
+n_excluidos <- sum(cruce_vcr_iic$iic < 0.02, na.rm = TRUE)
+n_excluidos
+
+cruce_vcr_iic_recortado <- cruce_vcr_iic |>
+  filter(iic >= 0.02)  
+
+cruce_vcr_iic_vol_recortado <- cruce_vcr_iic_vol |>
+  filter(iic >= 0.02)
+
+destacados_vol <- cruce_vcr_iic_vol_recortado |>
+  filter(cuci %in% c("562", "272", "842", "773", "522"))
+
+ggplot(cruce_vcr_iic_vol_recortado, aes(x = vcrn, y = iic)) +
+  annotate("rect", xmin = 0, xmax = Inf, ymin = 1, ymax = Inf,
+           fill = "steelblue", alpha = 0.06) +
+  annotate("rect", xmin = 0, xmax = Inf, ymin = 0, ymax = 1,
+           fill = "firebrick", alpha = 0.06) +
+  geom_point(aes(size = value), alpha = 0.35, color = "gray40") +
+  geom_point(data = destacados_vol, aes(size = value, color = cuci_desc)) +
+  geom_text_repel(
+    data = destacados_vol, aes(label = cuci_desc, color = cuci_desc),
+    size = 3.5, fontface = "bold", show.legend = FALSE,
+    box.padding = 0.8, point.padding = 0.4,
+    segment.color = "gray50", min.segment.length = 0
+  ) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray40", linewidth = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.4) +
+  scale_y_log10(labels = scales::label_number(accuracy = 0.01)) +
+  scale_size_continuous(range = c(1, 14), 
+                        labels = scales::label_number(suffix = "k US$"),
+                        guide = guide_legend(override.aes = list(color = "gray40", alpha = 0.5))) +
+  scale_color_brewer(palette = "Set1") +
+ guides(color = "none", size = "none") +
+  labs(
+    title = "Ventaja comparativa global, intensidad bilateral y volumen — Marruecos hacia España",
+    subtitle = "2024 · el tamaño del punto es el valor exportado a España",
+    x = "VCRN — ventaja comparativa revelada normalizada",
+    y = "IIC (escala log)",
+    size = "Exportaciones\n(miles US$)",
+    caption = "Línea punteada horizontal: IIC = 1 (comercio ni más ni menos intenso de lo esperado)\nLínea punteada vertical: VCRN = 0 (frontera entre ventaja y desventaja comparativa)"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray30", size = 11),
+    plot.caption = element_text(color = "gray50", size = 8, hjust = 0),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray92")
+  )
+
+ultimo_grafico <- last_plot()
+
+ggsave(
+  filename = "vcr_vs_iic_espana.png",
+  plot = ultimo_grafico,
+  width = 10, height = 6.5,
+  dpi = 300,          
+  bg = "white"          
+)
+
+ggsave("bubble_vcr_iic_espana.png", width = 11, height = 7, dpi = 300, bg = "white")
