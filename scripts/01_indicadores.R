@@ -133,7 +133,7 @@ ggplot(data = top5_desventaja) +
 
 # Grafico de evolución de los sectores top
 
-top_sectores <- top5_ventaja$cuci  # códigos de los 5 sectores top en 2024
+top_sectores <- top5_ventaja$cuci  
 
 vcr_mar |>
   filter(cuci %in% top_sectores) |>
@@ -217,7 +217,7 @@ iic_top5 <- mar_esp |>
   select(cuci, cuci_desc, iic) |>
   arrange(desc(iic))
 
-# AHORA FRANCIA
+# SEGUNDO FRANCIA :P
 
 # mar_fra <- comtrade_exp |>
 #   filter(r == "MAR", p == socio_1, year == anio, cuci %in% sectores_top5) |>
@@ -275,7 +275,7 @@ sum(icc_esp_mar$detalle$m, na.rm = TRUE)
 sum(icc_esp_mar$detalle$x, na.rm = TRUE)
 
 
-# 2) El ICC teóricamente está acotado entre 0 y 100 — confirmá que no se te fue de rango
+# 2) El ICC teóricamente está acotado entre 0 y 100
 icc_esp_mar$icc
 
 resultado_fra <- calcular_icc("FRA", 2024)
@@ -301,11 +301,11 @@ calcular_icc_producto <- function(socio, anio) {
   x_socio <- comtrade |>
     filter(r == socio, p == "WLD", flow == "Export", year == anio) |>
     mutate(x = value / sum(value, na.rm = TRUE)) |>
-    select(cuci, cuci_desc_x = cuci_desc, x)  # guardamos la descripción también acá
+    select(cuci, cuci_desc_x = cuci_desc, x)  #
   
   full_join(m_mar, x_socio, by = "cuci") |>
     mutate(
-      cuci_desc = coalesce(cuci_desc, cuci_desc_x),  # si falta de un lado, usa el otro
+      cuci_desc = coalesce(cuci_desc, cuci_desc_x),  
       m = replace_na(m, 0),
       x = replace_na(x, 0),
       icc_k = 100 * (1 - abs(m - x) / 2)
@@ -382,7 +382,6 @@ ggplot(iic_evolucion, aes(x = year, y = iic, color = cuci_desc)) +
 
 
 # cruce VCRN con IIC
-# Armamos la base combinando VCR 2024 con IIC 2024 hacia España, para todos los productos en común
 cruce_vcr_iic <- vcr_mar |>
   filter(year == 2024) |>
   select(cuci, cuci_desc, vcrn) |>
@@ -429,7 +428,6 @@ cruce_vcr_iic_filtrado <- cruce_vcr_iic |>
 #--------------------------------------------------------------#
 
 ggplot(cruce_vcr_iic_filtrado, aes(x = vcrn, y = iic)) +
-  # Sombreado de cuadrantes para que se lean de un vistazo
   annotate("rect", xmin = 0, xmax = Inf, ymin = 1, ymax = Inf,
            fill = "steelblue", alpha = 0.06) +
   annotate("rect", xmin = 0, xmax = Inf, ymin = 0, ymax = 1,
@@ -465,14 +463,14 @@ ggplot(cruce_vcr_iic_filtrado, aes(x = vcrn, y = iic)) +
 
 
 
-ultimo_grafico <- last_plot()  # toma el último gráfico ggplot que corriste
+ultimo_grafico <- last_plot()
 
 ggsave(
   filename = "vcr_vs_iic_espana.png",
   plot = ultimo_grafico,
   width = 10, height = 6.5,
-  dpi = 300,           # buena resolución para proyectar/imprimir
-  bg = "white"          # evita que quede con fondo transparente
+  dpi = 300,          
+  bg = "white"          
 )
 
 
