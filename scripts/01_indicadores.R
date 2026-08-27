@@ -426,7 +426,7 @@ ggplot(cruce_vcr_iic, aes(x = vcrn, y = iic)) +
 cruce_vcr_iic_filtrado <- cruce_vcr_iic |>
   filter(iic > 0, is.finite(iic))
 
-# Volvés a correr el ggplot con esta base en vez de cruce_vcr_iic
+#--------------------------------------------------------------#
 
 ggplot(cruce_vcr_iic_filtrado, aes(x = vcrn, y = iic)) +
   # Sombreado de cuadrantes para que se lean de un vistazo
