@@ -195,17 +195,19 @@ detalle_composicion <- mar_exp |>
   mutate(cuci_2d = substr(cuci, 1, 2)) |>
   left_join(lookup_2dig, by = "cuci_2d")
 
-ggplot(detalle_composicion, aes(x = reorder(desc_2d, value, sum), y = value, fill = cuci_desc)) +
+g_composicion <- ggplot(detalle_composicion, aes(x = reorder(desc_2d, value, sum), y = value, fill = cuci_desc)) +
   geom_col() +
   coord_flip() +
-  guides(fill = "none") +  # con tantos productos de 3 dígitos, una leyenda sería ilegible
+  guides(fill = "none") +
   labs(
     title = "Composición interna de las principales divisiones exportadoras (2 dígitos)",
     subtitle = "Marruecos, 2024 · cada segmento de color es un producto distinto de 3 dígitos",
     x = NULL, y = "Valor exportado (miles US$)"
   ) +
   theme_tp1()
-
+g_composicion
+ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
+       width = 10, height = 6.5, dpi = 300, bg = "white")
 
   #===============================================================================#
 # BLOQUE 3: VCR - Ventajas Comparativas Reveladas (Balassa, 1965)
