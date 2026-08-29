@@ -723,16 +723,3 @@ Brasil</figcaption>
 ggsave(paste0(ruta_graficos, "bubble_BRA.png"), p_bra, width = 10, height = 6.5, dpi = 300, bg = "white")
 ```
 
-## Conclusiones
-
-Marruecos muestra una ventaja comparativa muy marcada en fertilizantes
-(crudos y manufacturados), impulsada por su posición como principal
-exportador mundial de fosfatos. Sin embargo, este producto no es el que
-domina la relación bilateral con España pese a ser su principal socio
-comercial: el comercio con España está traccionado por manufacturas
-ligadas a cadenas de valor europeas (textiles, equipos eléctricos y
-autopartes), mientras que los fertilizantes se dirigen mayoritariamente
-a otros mercados como Brasil e India. A nivel agregado (2 dígitos), la
-industria automotriz y de equipos eléctricos superan en volumen a los
-fertilizantes, reflejando una integración industrial diversificada que
-convive con la especialización tradicional en fosfatos.
