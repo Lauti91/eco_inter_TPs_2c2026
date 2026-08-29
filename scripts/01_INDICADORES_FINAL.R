@@ -1,6 +1,6 @@
 #===============================================================================#
-# TP1 - Economía Internacional: SCRIPT MAESTRO FINAL
-# VCR (Balassa), IIC (Yeats), ICC (Michaely) - Marruecos, 2021-2025
+# TP1 - Economía Internacional: SCRIPT FINAL
+# Marruecos, 2021-2025
 # Repositorio: eco_inter_TPs_2c2026
 #===============================================================================#
 
@@ -132,93 +132,12 @@ destino_fertilizantes <- comtrade_mar |>
 
 destino_fertilizantes
 
-# --- Base auxiliar a 2 dígitos: solo para traer las descripciones oficiales de
-# cada división CUCI (Reporter = MAR, Partner = WLD, SITC Rev.3 a 2 dígitos) ---
-# comtrade_2dig <- limpiar_wits(paste0(ruta_datos, "MAR_2DIG_WLD.dta"))
-# distinct(comtrade_2dig, r); distinct(comtrade_2dig, p)  # chequeo de códigos, como siempre
-# 
-# lookup_2dig <- comtrade_2dig |>
-#   filter(r == "MAR", p == "WLD") |>
-#   distinct(cuci, cuci_desc) |>
-#   rename(cuci_2d = cuci, desc_2d = cuci_desc)
-# 
-# # Principales sectores exportadores/importadores a 2 dígitos, con nombre oficial
-# sectores_2dig_exp <- mar_exp |>
-#   filter(p == "WLD", year == 2024) |>
-#   mutate(cuci_2d = substr(cuci, 1, 2)) |>
-#   group_by(cuci_2d) |>
-#   summarise(total = sum(value, na.rm = TRUE)) |>
-#   arrange(desc(total)) |>
-#   slice_max(total, n = 5) |>
-#   left_join(lookup_2dig, by = "cuci_2d") |>
-#   relocate(desc_2d, .after = cuci_2d)
-# 
-# sectores_2dig_exp
-# 
-# sectores_2dig_imp <- mar_imp |>
-#   filter(p == "WLD", year == 2024) |>
-#   mutate(cuci_2d = substr(cuci, 1, 2)) |>
-#   group_by(cuci_2d) |>
-#   summarise(total = sum(value, na.rm = TRUE)) |>
-#   arrange(desc(total)) |>
-#   slice_max(total, n = 5) |>
-#   left_join(lookup_2dig, by = "cuci_2d") |>
-#   relocate(desc_2d, .after = cuci_2d)
-# 
-# sectores_2dig_imp
-# 
-# comtrade_mar |>
-#   filter(flow == "Export", p == "WLD", year == 2024, cuci == "562") |>
-#   pull(value)
-# 
-# # Descomposición de cada división de 2 dígitos en sus códigos de 3 dígitos,
-# # para confirmar cuántos productos distintos aportan a cada total agregado
-# 
-# composicion_2dig <- mar_exp |>
-#   filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
-#   mutate(cuci_2d = substr(cuci, 1, 2)) |>
-#   left_join(lookup_2dig, by = "cuci_2d") |>
-#   group_by(cuci_2d, desc_2d) |>
-#   summarise(
-#     n_productos_3d = n_distinct(cuci),                 # cuántos códigos de 3 dígitos aportan
-#     total = sum(value, na.rm = TRUE),
-#     top_producto = cuci_desc[which.max(value)],         # el producto que más pesa dentro de la división
-#     peso_top_producto = max(value) / sum(value) * 100,   # qué % del total de la división es ese producto
-#     .groups = "drop"
-#   ) |>
-#   arrange(desc(total))
-# 
-# composicion_2dig
-# 
-# detalle_composicion <- mar_exp |>
-#   filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
-#   mutate(cuci_2d = substr(cuci, 1, 2)) |>
-#   left_join(lookup_2dig, by = "cuci_2d")
-# 
-# g_composicion <- ggplot(detalle_composicion, aes(x = reorder(desc_2d, value, sum), y = value, fill = cuci_desc)) +
-#   geom_col() +
-#   coord_flip() +
-#   guides(fill = "none") +
-#   labs(
-#     title = "Composición interna de las principales divisiones exportadoras (2 dígitos)",
-#     subtitle = "Marruecos, 2024 · cada segmento de color es un producto distinto de 3 dígitos",
-#     x = NULL, y = "Valor exportado (miles US$)"
-#   ) +
-#   theme_tp1()
-# g_composicion
-# ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
-#        width = 10, height = 6.5, dpi = 300, bg = "white")
-
-#------- 
-#grafico try 2
-
-# Orden de apilado explícito: Resto abajo (cerca de 0), Producto principal arriba (extremo)
 orden_apilado <- c("Resto", "3° producto", "2° producto", "Producto principal")
 
 detalle_composicion <- detalle_composicion |>
   mutate(categoria_rank = factor(categoria_rank, levels = orden_apilado))
 
-# Calculamos manualmente el acumulado por división, en el orden de apilado
+# acumulado por división
 detalle_apilado <- detalle_composicion |>
   arrange(desc_2d, categoria_rank) |>
   group_by(desc_2d) |>
@@ -229,12 +148,12 @@ detalle_apilado <- detalle_composicion |>
   ) |>
   ungroup()
 
-# Etiqueta del producto principal: ahora centrada en su segmento real
+# Etiqueta del producto principal
 etiquetas_top <- detalle_apilado |>
   filter(rank_en_division == 1) |>
   mutate(label_completo = paste0(round(pct_division), "%"))
 
-# Totales por división, para el label del extremo derecho
+# Totales por división
 totales_division <- detalle_apilado |>
   group_by(desc_2d) |>
   summarise(total = max(ymax), .groups = "drop")
@@ -285,7 +204,7 @@ ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
        width = 10, height = 6.5, dpi = 300, bg = "white")
 
 
-  #===============================================================================#
+#===============================================================================#
 # BLOQUE 3: VCR - Ventajas Comparativas Reveladas (Balassa, 1965)
 #===============================================================================#
 
