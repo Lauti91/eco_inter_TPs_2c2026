@@ -233,6 +233,109 @@ knitr::kable(sectores_2dig_imp, caption = "Principales sectores importadores a 2
 
 Principales sectores importadores a 2 dígitos (2024)
 
+``` r
+detalle_composicion <- mar_exp |>
+  filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  group_by(cuci_2d) |>
+  mutate(
+    rank_en_division = rank(-value, ties.method = "first"),
+    pct_division = value / sum(value) * 100
+  ) |>
+  ungroup() |>
+  mutate(
+    categoria_rank = case_when(
+      rank_en_division == 1 ~ "Producto principal",
+      rank_en_division == 2 ~ "2° producto",
+      rank_en_division == 3 ~ "3° producto",
+      TRUE ~ "Resto"
+    ) |> factor(levels = c("Producto principal", "2° producto", "3° producto", "Resto"))
+  )
+
+# Orden de apilado explícito: Resto abajo (cerca de 0), Producto principal arriba (extremo)
+orden_apilado <- c("Resto", "3° producto", "2° producto", "Producto principal")
+detalle_composicion <- detalle_composicion |>
+  mutate(categoria_rank = factor(categoria_rank, levels = orden_apilado))
+
+# Calculamos manualmente el acumulado por división, en el orden de apilado
+detalle_apilado <- detalle_composicion |>
+  arrange(desc_2d, categoria_rank) |>
+  group_by(desc_2d) |>
+  mutate(
+    ymax = cumsum(value),
+    ymin = ymax - value,
+    y_centro = (ymin + ymax) / 2
+  ) |>
+  ungroup()
+
+# Etiqueta del producto principal: centrada en su segmento real
+etiquetas_top <- detalle_apilado |>
+  filter(rank_en_division == 1) |>
+  mutate(label_completo = paste0(round(pct_division), "%"))
+
+# Totales por división, para el label del extremo derecho
+totales_division <- detalle_apilado |>
+  group_by(desc_2d) |>
+  summarise(total = max(ymax), .groups = "drop")
+
+paleta_composicion <- c(
+  "Producto principal" = "#1b4965",
+  "2° producto"         = "#5fa8d3",
+  "3° producto"         = "#bee9e8",
+  "Resto"               = "#e8e8e8"
+)
+
+g_composicion <- ggplot(detalle_apilado, aes(x = reorder(desc_2d, ymax, max))) +
+  geom_rect(aes(xmin = as.numeric(reorder(desc_2d, ymax, max)) - 0.38,
+                xmax = as.numeric(reorder(desc_2d, ymax, max)) + 0.38,
+                ymin = ymin, ymax = ymax, fill = categoria_rank),
+            color = "white", linewidth = 0.6) +
+  geom_text(
+    data = etiquetas_top, aes(y = y_centro, label = label_completo),
+    color = "white", fontface = "bold", size = 4
+  ) +
+  geom_text(
+    data = totales_division, aes(x = desc_2d, y = total, label = scales::label_number(scale = 1/1000, suffix = "M", accuracy = 0.1)(total)),
+    hjust = -0.15, size = 3.8, fontface = "bold", color = "gray25", inherit.aes = FALSE
+  ) +
+  coord_flip(clip = "off") +
+  scale_fill_manual(values = paleta_composicion) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.14)), labels = NULL) +
+  labs(
+    title = "¿Qué tan concentrada está cada división exportadora?",
+    subtitle = "Marruecos, 2024 · el % indica el peso del producto principal dentro de su división",
+    x = NULL, y = NULL, fill = "Posición dentro\nde la división",
+    caption = "Total exportado por división indicado al final de cada barra (millones de US$)."
+  ) +
+  theme_tp1(base_size = 13) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold", color = "gray20"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    legend.position = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    plot.margin = margin(t = 10, r = 45, b = 10, l = 10)
+  )
+
+g_composicion
+```
+
+<figure>
+<img
+src="TP1---Indicadores-de-Comercio-Internacional--Marruecos_files/figure-gfm/composicion_2dig_grafico-1.png"
+alt="¿Qué tan concentrada está cada división exportadora?" />
+<figcaption aria-hidden="true">¿Qué tan concentrada está cada división
+exportadora?</figcaption>
+</figure>
+
+``` r
+ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
+       width = 10, height = 6.5, dpi = 300, bg = "white")
+```
+
 ## VCR - Ventajas Comparativas Reveladas (Balassa, 1965)
 
 ``` r
