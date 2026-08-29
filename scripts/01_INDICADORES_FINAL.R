@@ -119,6 +119,7 @@ top_socios <- mar_exp |>
   summarise(total = first(total_expo)) |>
   arrange(desc(total)) |>
   slice_max(total, n = 15)
+
 top_socios
 
 # Destino de los fertilizantes (272 y 562) - hallazgo clave del TP
@@ -128,16 +129,30 @@ destino_fertilizantes <- comtrade_mar |>
   summarise(total = sum(value, na.rm = TRUE), .groups = "drop") |>
   arrange(desc(total)) |>
   slice_max(total, n = 15)
+
 destino_fertilizantes
 
-# Principales sectores exportadores/importadores a 2 dígitos
+# --- Base auxiliar a 2 dígitos: solo para traer las descripciones oficiales de
+# cada división CUCI (Reporter = MAR, Partner = WLD, SITC Rev.3 a 2 dígitos) ---
+comtrade_2dig <- limpiar_wits(paste0(ruta_datos, "MAR_2DIG_WLD.dta"))
+distinct(comtrade_2dig, r); distinct(comtrade_2dig, p)  # chequeo de códigos, como siempre
+
+lookup_2dig <- comtrade_2dig |>
+  filter(r == "MAR", p == "WLD") |>
+  distinct(cuci, cuci_desc) |>
+  rename(cuci_2d = cuci, desc_2d = cuci_desc)
+
+# Principales sectores exportadores/importadores a 2 dígitos, con nombre oficial
 sectores_2dig_exp <- mar_exp |>
   filter(p == "WLD", year == 2024) |>
   mutate(cuci_2d = substr(cuci, 1, 2)) |>
   group_by(cuci_2d) |>
   summarise(total = sum(value, na.rm = TRUE)) |>
   arrange(desc(total)) |>
-  slice_max(total, n = 5)
+  slice_max(total, n = 5) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  relocate(desc_2d, .after = cuci_2d)
+
 sectores_2dig_exp
 
 sectores_2dig_imp <- mar_imp |>
@@ -146,11 +161,53 @@ sectores_2dig_imp <- mar_imp |>
   group_by(cuci_2d) |>
   summarise(total = sum(value, na.rm = TRUE)) |>
   arrange(desc(total)) |>
-  slice_max(total, n = 5)
+  slice_max(total, n = 5) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  relocate(desc_2d, .after = cuci_2d)
+
 sectores_2dig_imp
 
+comtrade_mar |>
+  filter(flow == "Export", p == "WLD", year == 2024, cuci == "562") |>
+  pull(value)
 
-#===============================================================================#
+# Descomposición de cada división de 2 dígitos en sus códigos de 3 dígitos,
+# para confirmar cuántos productos distintos aportan a cada total agregado
+
+composicion_2dig <- mar_exp |>
+  filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  group_by(cuci_2d, desc_2d) |>
+  summarise(
+    n_productos_3d = n_distinct(cuci),                 # cuántos códigos de 3 dígitos aportan
+    total = sum(value, na.rm = TRUE),
+    top_producto = cuci_desc[which.max(value)],         # el producto que más pesa dentro de la división
+    peso_top_producto = max(value) / sum(value) * 100,   # qué % del total de la división es ese producto
+    .groups = "drop"
+  ) |>
+  arrange(desc(total))
+
+composicion_2dig
+
+detalle_composicion <- mar_exp |>
+  filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  left_join(lookup_2dig, by = "cuci_2d")
+
+ggplot(detalle_composicion, aes(x = reorder(desc_2d, value, sum), y = value, fill = cuci_desc)) +
+  geom_col() +
+  coord_flip() +
+  guides(fill = "none") +  # con tantos productos de 3 dígitos, una leyenda sería ilegible
+  labs(
+    title = "Composición interna de las principales divisiones exportadoras (2 dígitos)",
+    subtitle = "Marruecos, 2024 · cada segmento de color es un producto distinto de 3 dígitos",
+    x = NULL, y = "Valor exportado (miles US$)"
+  ) +
+  theme_tp1()
+
+
+  #===============================================================================#
 # BLOQUE 3: VCR - Ventajas Comparativas Reveladas (Balassa, 1965)
 #===============================================================================#
 
