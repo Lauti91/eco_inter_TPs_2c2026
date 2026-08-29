@@ -160,6 +160,91 @@ g_heatmap <- ggplot(iic_heatmap_cat, aes(x = socio_label, y = reorder(cuci_desc,
 g_heatmap
 ggsave("grafico_heatmap_iic.png", g_heatmap, width = 11, height = 7, dpi = 300, bg = "white")
 
+iic_heatmap_completo <- iic_heatmap |>
+  tidyr::complete(socio = c("ESP", "FRA", "DEU", "USA", "BRA"), cuci, fill = list(iic = 0)) |>
+  left_join(iic_heatmap |> distinct(cuci, cuci_desc), by = "cuci")
+
+iic_heatmap_cat <- iic_heatmap_completo |>
+  mutate(
+    socio_label = factor(socio, levels = names(paleta_socios), labels = nombres_socio[names(paleta_socios)]),
+    categoria = case_when(
+      iic == 0 ~ "Sin comercio",
+      iic < 0.5 ~ "Muy subrepresentado (<0.5)",
+      iic < 1 ~ "Subrepresentado (0.5-1)",
+      iic < 2 ~ "Intenso (1-2)",
+      TRUE ~ "Muy intenso (>2)"
+    ) |> factor(levels = c("Sin comercio", "Muy subrepresentado (<0.5)",
+                            "Subrepresentado (0.5-1)", "Intenso (1-2)", "Muy intenso (>2)"))
+  )
+
+ggplot(iic_heatmap_cat, aes(x = socio_label, y = reorder(cuci_desc, iic), fill = categoria)) +
+  geom_tile(color = "gray95", linewidth = 0.8) +
+  geom_text(aes(label = ifelse(iic == 0, "—", round(iic, 2))), size = 3, color = "gray15") +
+  scale_fill_manual(values = c(
+    "Sin comercio" = "gray88",
+    "Muy subrepresentado (<0.5)" = "#fee0d2",
+    "Subrepresentado (0.5-1)" = "#fc9272",
+    "Intenso (1-2)" = "#a1d99b",
+    "Muy intenso (>2)" = "#31a354"
+  )) +
+  labs(
+    title = "IIC de los bienes más exportados por Marruecos, por socio comercial",
+    subtitle = "2024 · bienes ordenados por volumen exportado al mundo",
+    x = "Socio comercial", y = NULL, fill = "Intensidad",
+    caption = "IIC = 1 indica comercio bilateral proporcional al patrón exportador global de Marruecos."
+  ) +
+  theme_tp1(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    axis.ticks = element_blank()
+  )
+
+
+# HEATMAP COMPLETO
+
+iic_heatmap_completo <- iic_heatmap |>
+  tidyr::complete(socio = c("ESP", "FRA", "DEU", "USA", "BRA"), cuci, fill = list(iic = 0)) |>
+  left_join(iic_heatmap |> distinct(cuci, cuci_desc), by = "cuci")
+
+iic_heatmap_cat <- iic_heatmap_completo |>
+  mutate(
+    socio_label = factor(socio, levels = names(paleta_socios), labels = nombres_socio[names(paleta_socios)]),
+    categoria = case_when(
+      iic == 0 ~ "Sin comercio",
+      iic < 0.5 ~ "Muy subrepresentado (<0.5)",
+      iic < 1 ~ "Subrepresentado (0.5-1)",
+      iic < 2 ~ "Intenso (1-2)",
+      TRUE ~ "Muy intenso (>2)"
+    ) |> factor(levels = c("Sin comercio", "Muy subrepresentado (<0.5)",
+                           "Subrepresentado (0.5-1)", "Intenso (1-2)", "Muy intenso (>2)"))
+  )
+
+ggplot(iic_heatmap_cat, aes(x = socio_label, y = reorder(cuci_desc, iic), fill = categoria)) +
+  geom_tile(color = "gray95", linewidth = 0.8) +
+  geom_text(aes(label = ifelse(iic == 0, "—", round(iic, 2))), size = 3, color = "gray15") +
+  scale_fill_manual(values = c(
+    "Sin comercio" = "gray88",
+    "Muy subrepresentado (<0.5)" = "#fee0d2",
+    "Subrepresentado (0.5-1)" = "#fc9272",
+    "Intenso (1-2)" = "#a1d99b",
+    "Muy intenso (>2)" = "#31a354"
+  )) +
+  labs(
+    title = "IIC de los bienes más exportados por Marruecos, por socio comercial",
+    subtitle = "2024 · bienes ordenados por volumen exportado al mundo",
+    x = "Socio comercial", y = NULL, fill = "Intensidad",
+    caption = "IIC = 1 indica comercio bilateral proporcional al patrón exportador global de Marruecos."
+  ) +
+  theme_tp1(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    axis.ticks = element_blank()
+  )
+
 
 #===============================================================================#
 # 5) BUBBLE CHART — VCR vs. IIC, uno por socio (para elegir cuál presentar)
