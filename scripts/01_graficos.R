@@ -243,3 +243,5 @@ for (s in names(umbrales_iic)) {
   ggsave(paste0("bubble_", s, ".png"), plot = p, width = 10, height = 6.5, dpi = 300, bg = "white")
 }
 
+#test
+
