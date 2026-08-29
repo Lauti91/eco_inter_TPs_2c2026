@@ -1,6 +1,5 @@
 TP1 - Indicadores de Comercio Internacional: Marruecos
 ================
-2026-08-29
 
 ## Introducción
 
