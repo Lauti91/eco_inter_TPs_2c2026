@@ -155,3 +155,69 @@ for (s in socios_finales) {
 
 
 #S
+
+# Calculamos qué % del ancho total de la barra ocupa cada segmento, para decidir si entra el texto
+detalle_apilado <- detalle_apilado |>
+  group_by(desc_2d) |>
+  mutate(total_row = max(ymax), ancho_pct = value / total_row * 100) |>
+  ungroup()
+
+# Etiqueta del producto principal: nombre + %, siempre se muestra (es el segmento más ancho)
+etiquetas_top <- detalle_apilado |>
+  filter(rank_en_division == 1) |>
+  mutate(label_completo = paste0(str_trunc(cuci_desc, 22), "\n", round(pct_division), "%"))
+
+# Etiquetas de 2° y 3° producto: solo si el segmento ocupa más de ~9% del ancho total de su barra
+etiquetas_secundarias <- detalle_apilado |>
+  filter(rank_en_division %in% c(2, 3), ancho_pct > 9) |>
+  mutate(
+    label_corto = str_trunc(cuci_desc, 16),
+    color_texto = if_else(categoria_rank == "2° producto", "white", "gray20")
+  )
+
+totales_division <- detalle_apilado |>
+  group_by(desc_2d) |>
+  summarise(total = max(ymax), .groups = "drop")
+
+g_composicion <- ggplot(detalle_apilado, aes(x = reorder(desc_2d, ymax, max))) +
+  geom_rect(aes(xmin = as.numeric(reorder(desc_2d, ymax, max)) - 0.38,
+                xmax = as.numeric(reorder(desc_2d, ymax, max)) + 0.38,
+                ymin = ymin, ymax = ymax, fill = categoria_rank),
+            color = "white", linewidth = 0.6) +
+  geom_text(
+    data = etiquetas_top, aes(y = y_centro, label = label_completo),
+    color = "white", fontface = "bold", size = 3.4, lineheight = 0.9
+  ) +
+  geom_text(
+    data = etiquetas_secundarias, aes(y = y_centro, label = label_corto, color = color_texto),
+    fontface = "bold", size = 2.7, show.legend = FALSE
+  ) +
+  scale_color_identity() +
+  geom_text(
+    data = totales_division, aes(x = desc_2d, y = total, label = scales::label_number(scale = 1/1000, suffix = "M", accuracy = 0.1)(total)),
+    hjust = -0.15, size = 3.8, fontface = "bold", color = "gray25", inherit.aes = FALSE
+  ) +
+  coord_flip(clip = "off") +
+  scale_fill_manual(values = paleta_composicion) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.14)), labels = NULL) +
+  labs(
+    title = "¿Qué tan concentrada está cada división exportadora?",
+    subtitle = "Marruecos, 2024 · producto principal de cada división y su peso relativo",
+    x = NULL, y = NULL, fill = "Posición dentro\nde la división",
+    caption = "Total exportado por división indicado al final de cada barra (millones de US$). Segmentos muy angostos no muestran nombre por espacio."
+  ) +
+  theme_tp1(base_size = 13) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold", color = "gray20"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    legend.position = "top",
+    legend.justification = "left",
+    plot.title.position = "plot",
+    plot.margin = margin(t = 10, r = 45, b = 10, l = 10)
+  )
+
+g_composicion
+ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
+       width = 11, height = 7, dpi = 300, bg = "white")
