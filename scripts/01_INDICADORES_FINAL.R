@@ -127,13 +127,11 @@ wld_exp <- comtrade_wld |>
 # BLOQUE 2: PERFIL DE COMERCIO EXTERIOR (punto 2 de la consigna)
 #===============================================================================#
 
-# Parámetros del bloque: cantidad de bienes/países a mostrar en cada desglose
 n_bienes <- 5
 n_paises <- 4
 
-# Ranking real de socios comerciales de Marruecos por EXPORTACIONES (2024)
-# (se reutiliza más abajo, en 2.4, para el ranking país-a-país; evita
-# recalcular lo mismo dos veces con otro nombre)
+# Ranking de socios comerciales de Marruecos por EXPORTACIONES 
+# (se reutiliza más abajo, en 2.4, para el ranking país-a-país)
 top_socios <- mar_exp |>
   filter(p != "WLD", year == 2024) |>
   group_by(p) |>
@@ -144,7 +142,7 @@ top_socios <- mar_exp |>
 
 top_socios
 
-# Destino de los fertilizantes (272 y 562) - hallazgo clave del TP
+# Destino de los fertilizantes (272 y 562) 
 destino_fertilizantes <- comtrade_mar |>
   filter(flow == "Export", year == 2024, cuci %in% c("272", "562"), p != "WLD") |>
   group_by(p, cuci_desc) |>
@@ -155,7 +153,7 @@ destino_fertilizantes <- comtrade_mar |>
 
 destino_fertilizantes
 
-# Lookup de descripciones a nivel 2 dígitos (división SITC)
+# Lookup de descripciones a nivel 2 dígitos 
 lookup_2dig <- comtrade_2dig |>
   filter(r == "MAR", p == "WLD") |>
   distinct(cuci, cuci_desc) |>
@@ -188,7 +186,7 @@ sectores_2dig_imp <- mar_imp |>
 
 sectores_2dig_imp
 
-# Rankeamos cada producto (3 dígitos) dentro de su propia división (2 dígitos)
+# Ranking de cada producto (3 dígitos) dentro de su propia división (2 dígitos)
 # 1 = el más grande de esa división
 detalle_composicion <- mar_exp |>
   filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
@@ -214,7 +212,7 @@ orden_apilado <- c("Resto", "3° producto", "2° producto", "Producto principal"
 detalle_composicion <- detalle_composicion |>
   mutate(categoria_rank = factor(categoria_rank, levels = orden_apilado))
 
-# Acumulado por división (posiciones reales del apilado, para ubicar labels)
+# Acumulado por división 
 detalle_apilado <- detalle_composicion |>
   arrange(desc_2d, categoria_rank) |>
   group_by(desc_2d) |>
@@ -230,8 +228,6 @@ etiquetas_top <- detalle_apilado |>
   filter(rank_en_division == 1) |>
   mutate(label_completo = paste0(round(pct_division), "%"))
 
-# Totales por división (ya en millones de USD: total viene en miles de USD,
-# dividir por 1000 da directamente millones — no requiere formatear_valor)
 totales_division <- detalle_apilado |>
   group_by(desc_2d) |>
   summarise(total = max(ymax), .groups = "drop")
@@ -367,9 +363,7 @@ tabla_paises_imp <- pmap_dfr(
 )
 tabla_paises_imp
 
-## --- 2.4: Ranking de países (exportaciones e importaciones totales) ---
-## El ranking exportador (top_socios) ya se calculó al inicio del Bloque 2;
-## acá solo se agrega el equivalente del lado importador.
+## --- 2.4: Ranking de países por importaciones totales ---
 
 ranking_paises_imp <- mar_imp |>
   filter(p != "WLD", year == 2024) |>
@@ -400,7 +394,7 @@ top_ventaja <- vcr_mar |> filter(year == 2024) |> slice_max(vcrn, n = 12)
 top_desventaja <- vcr_mar |> filter(year == 2024) |> slice_min(vcrn, n = 12)
 sectores_top <- top_ventaja$cuci
 
-# Top volumen (para el cruce volumen vs. especialización)
+# Top volumen 
 top_volumen <- mar_exp |>
   filter(p == "WLD", year == 2024) |>
   select(cuci, cuci_desc, value) |>
@@ -463,7 +457,6 @@ iic_heatmap <- map_dfr(socios_finales, function(s) {
   calcular_iic_multi(s, sectores_volumen, 2024) |> mutate(socio = s)
 })
 
-# Completamos la grilla (evita huecos cuando un producto no tiene comercio con algún socio)
 iic_heatmap_completo <- iic_heatmap |>
   tidyr::complete(socio = socios_finales, cuci, fill = list(iic = 0)) |>
   select(-cuci_desc) |>
@@ -525,7 +518,7 @@ ranking_icc <- map_dfr(candidatos, ~tibble(socio = .x, icc = calcular_icc(.x, 20
   arrange(desc(icc))
 ranking_icc
 
-# Evolución del ICC (excluyendo Brasil, que distorsiona la escala)
+# Evolución del ICC (excluyendo Brasil)
 icc_evolucion <- map_dfr(2021:2025, function(a) {
   map_dfr(socios_finales, ~tibble(year = a, socio = .x, icc = calcular_icc(.x, a)$icc))
 })
