@@ -1,5 +1,6 @@
 TP1 - Indicadores de Comercio Internacional: Marruecos
 ================
+2026-08-29
 
 ## Introducción
 
@@ -9,11 +10,33 @@ el TP1 de Economía Internacional. Se utilizan bases de UN Comtrade/WITS
 bajo nomenclatura CUCI Rev. 3 a 3 dígitos, para el período 2021-2025.
 
 ``` r
+if (!requireNamespace("RColorBrewer", quietly = TRUE)) install.packages("RColorBrewer", repos = "https://cloud.r-project.org")
+if (!requireNamespace("scales", quietly = TRUE)) install.packages("scales", repos = "https://cloud.r-project.org")
+
 library(tidyverse)
 library(haven)
 library(ggrepel)
 library(RColorBrewer)
 library(scales)
+```
+
+## Formato de valores monetarios
+
+El campo `value` de WITS viene expresado en **miles de USD**
+(`TradeValueIn1000USD`). Para evitar leer, por ejemplo, “18209308” como
+si ya fueran dólares (cuando en realidad son 18.209.308 miles de USD =
+18,21 mil millones de USD), se define una función que convierte cada
+valor a una unidad legible según su magnitud.
+
+``` r
+formatear_valor <- function(valor_miles_usd, digits_grandes = 2, digits_chicos = 1) {
+  valor_usd <- valor_miles_usd * 1000
+  dplyr::if_else(
+    valor_usd >= 1e9,
+    paste0(scales::number(valor_usd / 1e9, accuracy = 10^-digits_grandes), " mil millones USD"),
+    paste0(scales::number(valor_usd / 1e6, accuracy = 10^-digits_chicos), " millones USD")
+  )
+}
 ```
 
 ## Configuración de rutas y estilo
@@ -81,6 +104,7 @@ limpiar_wits <- function(path, incluir_desc = TRUE) {
 comtrade_mar <- limpiar_wits(paste0(ruta_datos, "MAR_ALLPARTNERS_WLD.dta"))
 comtrade_socios <- limpiar_wits(paste0(ruta_datos, "SOCIOS_WLD.dta"))
 comtrade_wld <- limpiar_wits(paste0(ruta_datos, "WLD_WLD.dta"), incluir_desc = FALSE)
+comtrade_2dig <- limpiar_wits(paste0(ruta_datos, "MAR_2DIG_WLD.dta"))
 ```
 
 ``` r
@@ -117,28 +141,31 @@ top_socios <- mar_exp |>
   group_by(p) |>
   summarise(total = first(total_expo)) |>
   arrange(desc(total)) |>
-  slice_max(total, n = 15)
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
 
-knitr::kable(top_socios, caption = "Top 15 socios comerciales de Marruecos por exportaciones (2024)")
+knitr::kable(top_socios |> select(p, total_fmt),
+             col.names = c("Socio", "Exportaciones"),
+             caption = "Top 15 socios comerciales de Marruecos por exportaciones (2024)")
 ```
 
-| p   |      total |
-|:----|-----------:|
-| ESP | 18209308.1 |
-| FRA | 15837620.6 |
-| DEU |  4401897.0 |
-| ITA |  4229035.2 |
-| GBR |  3533492.1 |
-| IND |  2692825.2 |
-| BRA |  2624626.2 |
-| USA |  2420911.5 |
-| NLD |  1326233.0 |
-| PRT |  1298940.0 |
-| PAK |  1229210.8 |
-| BEL |  1144236.0 |
-| ROM |  1038297.0 |
-| AUS |   879862.6 |
-| HKG |   733122.6 |
+| Socio | Exportaciones          |
+|:------|:-----------------------|
+| ESP   | 18.21 mil millones USD |
+| FRA   | 15.84 mil millones USD |
+| DEU   | 4.40 mil millones USD  |
+| ITA   | 4.23 mil millones USD  |
+| GBR   | 3.53 mil millones USD  |
+| IND   | 2.69 mil millones USD  |
+| BRA   | 2.62 mil millones USD  |
+| USA   | 2.42 mil millones USD  |
+| NLD   | 1.33 mil millones USD  |
+| PRT   | 1.30 mil millones USD  |
+| PAK   | 1.23 mil millones USD  |
+| BEL   | 1.14 mil millones USD  |
+| ROM   | 1.04 mil millones USD  |
+| AUS   | 879.9 millones USD     |
+| HKG   | 733.1 millones USD     |
 
 Top 15 socios comerciales de Marruecos por exportaciones (2024)
 
@@ -150,36 +177,37 @@ destino_fertilizantes <- comtrade_mar |>
   group_by(p, cuci_desc) |>
   summarise(total = sum(value, na.rm = TRUE), .groups = "drop") |>
   arrange(desc(total)) |>
-  slice_max(total, n = 15)
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
 
-knitr::kable(destino_fertilizantes, caption = "Principales destinos de fertilizantes crudos y manufacturados (2024)")
+knitr::kable(destino_fertilizantes |> select(p, cuci_desc, total_fmt),
+             col.names = c("Socio", "Producto", "Valor"),
+             caption = "Principales destinos de fertilizantes crudos y manufacturados (2024)")
 ```
 
-| p   | cuci_desc                |     total |
-|:----|:-------------------------|----------:|
-| BRA | Manufactured fertilizers | 2404754.1 |
-| IND | Manufactured fertilizers | 1630921.5 |
-| AUS | Manufactured fertilizers |  825005.7 |
-| ARG | Manufactured fertilizers |  634934.9 |
-| USA | Manufactured fertilizers |  545561.4 |
-| CAN | Manufactured fertilizers |  369300.3 |
-| FRA | Manufactured fertilizers |  249751.6 |
-| ESP | Manufactured fertilizers |  248112.3 |
-| IND | Fertilizers crude        |  217187.6 |
-| MEX | Fertilizers crude        |  173920.8 |
-| ROM | Manufactured fertilizers |  139539.4 |
-| NGA | Manufactured fertilizers |  130819.1 |
-| GBR | Manufactured fertilizers |  129959.0 |
-| BEL | Manufactured fertilizers |  126390.1 |
-| ITA | Manufactured fertilizers |  116558.3 |
+| Socio | Producto                 | Valor                 |
+|:------|:-------------------------|:----------------------|
+| BRA   | Manufactured fertilizers | 2.40 mil millones USD |
+| IND   | Manufactured fertilizers | 1.63 mil millones USD |
+| AUS   | Manufactured fertilizers | 825.0 millones USD    |
+| ARG   | Manufactured fertilizers | 634.9 millones USD    |
+| USA   | Manufactured fertilizers | 545.6 millones USD    |
+| CAN   | Manufactured fertilizers | 369.3 millones USD    |
+| FRA   | Manufactured fertilizers | 249.8 millones USD    |
+| ESP   | Manufactured fertilizers | 248.1 millones USD    |
+| IND   | Fertilizers crude        | 217.2 millones USD    |
+| MEX   | Fertilizers crude        | 173.9 millones USD    |
+| ROM   | Manufactured fertilizers | 139.5 millones USD    |
+| NGA   | Manufactured fertilizers | 130.8 millones USD    |
+| GBR   | Manufactured fertilizers | 130.0 millones USD    |
+| BEL   | Manufactured fertilizers | 126.4 millones USD    |
+| ITA   | Manufactured fertilizers | 116.6 millones USD    |
 
 Principales destinos de fertilizantes crudos y manufacturados (2024)
 
 ### Principales sectores a 2 dígitos
 
 ``` r
-comtrade_2dig <- limpiar_wits(paste0(ruta_datos, "MAR_2DIG_WLD.dta"))
-
 lookup_2dig <- comtrade_2dig |>
   filter(r == "MAR", p == "WLD") |>
   distinct(cuci, cuci_desc) |>
@@ -193,18 +221,21 @@ sectores_2dig_exp <- mar_exp |>
   arrange(desc(total)) |>
   slice_max(total, n = 5) |>
   left_join(lookup_2dig, by = "cuci_2d") |>
-  relocate(desc_2d, .after = cuci_2d)
+  relocate(desc_2d, .after = cuci_2d) |>
+  mutate(total_fmt = formatear_valor(total))
 
-knitr::kable(sectores_2dig_exp, caption = "Principales sectores exportadores a 2 dígitos (2024)")
+knitr::kable(sectores_2dig_exp |> select(cuci_2d, desc_2d, total_fmt),
+             col.names = c("División", "Descripción", "Valor"),
+             caption = "Principales sectores exportadores a 2 dígitos (2024)")
 ```
 
-| cuci_2d | desc_2d                  |    total |
-|:--------|:-------------------------|---------:|
-| 78      | Road vehicles            | 16395173 |
-| 77      | Electrical equipment     | 15803618 |
-| 56      | Manufactured fertilizers | 12635121 |
-| 84      | Apparel/clothing/access  |  7786711 |
-| 05      | Vegetables and fruit     |  4639179 |
+| División | Descripción              | Valor                  |
+|:---------|:-------------------------|:-----------------------|
+| 78       | Road vehicles            | 16.40 mil millones USD |
+| 77       | Electrical equipment     | 15.80 mil millones USD |
+| 56       | Manufactured fertilizers | 12.64 mil millones USD |
+| 84       | Apparel/clothing/access  | 7.79 mil millones USD  |
+| 05       | Vegetables and fruit     | 4.64 mil millones USD  |
 
 Principales sectores exportadores a 2 dígitos (2024)
 
@@ -217,22 +248,36 @@ sectores_2dig_imp <- mar_imp |>
   arrange(desc(total)) |>
   slice_max(total, n = 5) |>
   left_join(lookup_2dig, by = "cuci_2d") |>
-  relocate(desc_2d, .after = cuci_2d)
+  relocate(desc_2d, .after = cuci_2d) |>
+  mutate(total_fmt = formatear_valor(total))
 
-knitr::kable(sectores_2dig_imp, caption = "Principales sectores importadores a 2 dígitos (2024)")
+knitr::kable(sectores_2dig_imp |> select(cuci_2d, desc_2d, total_fmt),
+             col.names = c("División", "Descripción", "Valor"),
+             caption = "Principales sectores importadores a 2 dígitos (2024)")
 ```
 
-| cuci_2d | desc_2d                  |    total |
-|:--------|:-------------------------|---------:|
-| 77      | Electrical equipment     | 10523216 |
-| 78      | Road vehicles            | 10490036 |
-| 33      | Petroleum and products   |  8123339 |
-| 65      | Textile yarn/fabric/art. |  6647521 |
-| 71      | Power generating equipmt |  3855136 |
+| División | Descripción              | Valor                  |
+|:---------|:-------------------------|:-----------------------|
+| 77       | Electrical equipment     | 10.52 mil millones USD |
+| 78       | Road vehicles            | 10.49 mil millones USD |
+| 33       | Petroleum and products   | 8.12 mil millones USD  |
+| 65       | Textile yarn/fabric/art. | 6.65 mil millones USD  |
+| 71       | Power generating equipmt | 3.86 mil millones USD  |
 
 Principales sectores importadores a 2 dígitos (2024)
 
+### Composición interna de las principales divisiones
+
+A nivel de 2 dígitos, la industria automotriz y de equipos eléctricos
+superan en volumen a los fertilizantes manufacturados. Antes de
+interpretar esto como una “caída” de los fertilizantes, se verifica si
+se trata de un efecto de agregación: ¿cuántos productos distintos de 3
+dígitos componen cada división, y qué tan concentrado está el total en
+el producto principal?
+
 ``` r
+# Rankeamos cada producto (3 dígitos) dentro de su propia división (2 dígitos)
+# 1 = el más grande de esa división
 detalle_composicion <- mar_exp |>
   filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
   mutate(cuci_2d = substr(cuci, 1, 2)) |>
@@ -249,7 +294,7 @@ detalle_composicion <- mar_exp |>
       rank_en_division == 2 ~ "2° producto",
       rank_en_division == 3 ~ "3° producto",
       TRUE ~ "Resto"
-    ) |> factor(levels = c("Producto principal", "2° producto", "3° producto", "Resto"))
+    )
   )
 
 # Orden de apilado explícito: Resto abajo (cerca de 0), Producto principal arriba (extremo)
@@ -257,7 +302,7 @@ orden_apilado <- c("Resto", "3° producto", "2° producto", "Producto principal"
 detalle_composicion <- detalle_composicion |>
   mutate(categoria_rank = factor(categoria_rank, levels = orden_apilado))
 
-# Calculamos manualmente el acumulado por división, en el orden de apilado
+# Acumulado por división (posiciones reales del apilado, para ubicar labels)
 detalle_apilado <- detalle_composicion |>
   arrange(desc_2d, categoria_rank) |>
   group_by(desc_2d) |>
@@ -268,12 +313,12 @@ detalle_apilado <- detalle_composicion |>
   ) |>
   ungroup()
 
-# Etiqueta del producto principal: centrada en su segmento real
+# Etiqueta del producto principal
 etiquetas_top <- detalle_apilado |>
   filter(rank_en_division == 1) |>
   mutate(label_completo = paste0(round(pct_division), "%"))
 
-# Totales por división, para el label del extremo derecho
+# Totales por división
 totales_division <- detalle_apilado |>
   group_by(desc_2d) |>
   summarise(total = max(ymax), .groups = "drop")
@@ -295,7 +340,8 @@ g_composicion <- ggplot(detalle_apilado, aes(x = reorder(desc_2d, ymax, max))) +
     color = "white", fontface = "bold", size = 4
   ) +
   geom_text(
-    data = totales_division, aes(x = desc_2d, y = total, label = scales::label_number(scale = 1/1000, suffix = "M", accuracy = 0.1)(total)),
+    data = totales_division,
+    aes(x = desc_2d, y = total, label = scales::label_number(scale = 1/1000, suffix = "M", accuracy = 0.1)(total)),
     hjust = -0.15, size = 3.8, fontface = "bold", color = "gray25", inherit.aes = FALSE
   ) +
   coord_flip(clip = "off") +
@@ -324,7 +370,7 @@ g_composicion
 
 <figure>
 <img
-src="TP1---Indicadores-de-Comercio-Internacional--Marruecos_files/figure-gfm/composicion_2dig_grafico-1.png"
+src="TP1---Indicadores-de-Comercio-Internacional--Marruecos_files/figure-gfm/composicion_2dig-1.png"
 alt="¿Qué tan concentrada está cada división exportadora?" />
 <figcaption aria-hidden="true">¿Qué tan concentrada está cada división
 exportadora?</figcaption>
@@ -334,6 +380,14 @@ exportadora?</figcaption>
 ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
        width = 10, height = 6.5, dpi = 300, bg = "white")
 ```
+
+La división de fertilizantes manufacturados es, en la práctica
+exportadora marroquí, prácticamente sinónimo de un único código de
+producto (100% de concentración). En cambio, vehículos y equipos
+eléctricos, si bien están liderados por un producto principal, se apoyan
+en una cadena de varios códigos complementarios, reflejando una
+integración industrial más compleja frente a la exportación directa de
+una materia prima procesada.
 
 ## VCR - Ventajas Comparativas Reveladas (Balassa, 1965)
 
@@ -427,7 +481,8 @@ top_volumen <- mar_exp |>
   filter(p == "WLD", year == 2024) |>
   select(cuci, cuci_desc, value) |>
   arrange(desc(value)) |>
-  slice_max(value, n = 12)
+  slice_max(value, n = 12) |>
+  mutate(value_fmt = formatear_valor(value))
 
 socios_finales <- c("ESP", "FRA", "DEU", "USA", "BRA")
 sectores_volumen <- top_volumen$cuci
@@ -722,3 +777,16 @@ Brasil</figcaption>
 ggsave(paste0(ruta_graficos, "bubble_BRA.png"), p_bra, width = 10, height = 6.5, dpi = 300, bg = "white")
 ```
 
+## Conclusiones
+
+Marruecos muestra una ventaja comparativa muy marcada en fertilizantes
+(crudos y manufacturados), impulsada por su posición como principal
+exportador mundial de fosfatos. Sin embargo, este producto no es el que
+domina la relación bilateral con España pese a ser su principal socio
+comercial: el comercio con España está traccionado por manufacturas
+ligadas a cadenas de valor europeas (textiles, equipos eléctricos y
+autopartes), mientras que los fertilizantes se dirigen mayoritariamente
+a otros mercados como Brasil e India. A nivel agregado (2 dígitos), la
+industria automotriz y de equipos eléctricos superan en volumen a los
+fertilizantes, reflejando una integración industrial diversificada que
+convive con la especialización tradicional en fosfatos.
