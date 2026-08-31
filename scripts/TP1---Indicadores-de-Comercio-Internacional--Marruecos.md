@@ -44,6 +44,10 @@ formatear_valor <- function(valor_miles_usd, digits_grandes = 2, digits_chicos =
 ``` r
 ruta_datos <- "bases de datos/"
 ruta_graficos <- "graficos/01/"
+
+# Cantidad de bienes/países a mostrar en los desgloses del perfil de comercio
+n_bienes <- 5
+n_paises <- 4
 ```
 
 ``` r
@@ -133,6 +137,151 @@ wld_exp <- comtrade_wld |>
 
 ## Perfil de comercio exterior
 
+### Principales bienes exportados e importados
+
+``` r
+top_bienes_exp <- mar_exp |>
+  filter(p == "WLD", year == 2024) |>
+  select(cuci, cuci_desc, value) |>
+  slice_max(value, n = n_bienes) |>
+  mutate(flow = "Exportado", value_fmt = formatear_valor(value))
+
+top_bienes_imp <- mar_imp |>
+  filter(p == "WLD", year == 2024) |>
+  select(cuci, cuci_desc, value) |>
+  slice_max(value, n = n_bienes) |>
+  mutate(flow = "Importado", value_fmt = formatear_valor(value))
+
+knitr::kable(top_bienes_exp |> select(cuci, cuci_desc, value_fmt),
+             col.names = c("Código", "Producto", "Valor"),
+             caption = "Principales bienes exportados por Marruecos (2024)")
+```
+
+| Código | Producto                 | Valor                  |
+|:-------|:-------------------------|:-----------------------|
+| 781    | Passenger cars etc       | 12.79 mil millones USD |
+| 562    | Manufactured fertilizers | 12.64 mil millones USD |
+| 773    | Electrical distrib equip | 10.83 mil millones USD |
+| 842    | Women/girl clothing wven | 4.28 mil millones USD  |
+| 784    | Motor veh parts/access   | 3.44 mil millones USD  |
+
+Principales bienes exportados por Marruecos (2024)
+
+``` r
+knitr::kable(top_bienes_imp |> select(cuci, cuci_desc, value_fmt),
+             col.names = c("Código", "Producto", "Valor"),
+             caption = "Principales bienes importados por Marruecos (2024)")
+```
+
+| Código | Producto                 | Valor                 |
+|:-------|:-------------------------|:----------------------|
+| 334    | Heavy petrol/bitum oils  | 7.74 mil millones USD |
+| 784    | Motor veh parts/access   | 6.41 mil millones USD |
+| 773    | Electrical distrib equip | 3.82 mil millones USD |
+| 792    | Aircraft/spacecraft/etc  | 3.00 mil millones USD |
+| 772    | Electric circuit equipmt | 2.94 mil millones USD |
+
+Principales bienes importados por Marruecos (2024)
+
+### Evolución del comercio total y saldo comercial
+
+``` r
+comercio_total <- bind_rows(
+  mar_exp |> filter(p == "WLD") |> distinct(year, total_expo) |> rename(total = total_expo) |> mutate(flujo = "Exportaciones"),
+  mar_imp |> filter(p == "WLD") |> distinct(year, total_impo) |> rename(total = total_impo) |> mutate(flujo = "Importaciones")
+) |>
+  mutate(total_fmt = formatear_valor(total))
+
+knitr::kable(comercio_total |> select(year, flujo, total_fmt) |> arrange(year, flujo),
+             col.names = c("Año", "Flujo", "Valor"),
+             caption = "Exportaciones e importaciones totales de Marruecos (2021-2025)")
+```
+
+|  Año | Flujo         | Valor                   |
+|-----:|:--------------|:------------------------|
+| 2021 | Exportaciones | 36.59 mil millones USD  |
+| 2021 | Importaciones | 58.68 mil millones USD  |
+| 2022 | Exportaciones | 42.18 mil millones USD  |
+| 2022 | Importaciones | 72.58 mil millones USD  |
+| 2023 | Exportaciones | 42.46 mil millones USD  |
+| 2023 | Importaciones | 70.64 mil millones USD  |
+| 2024 | Exportaciones | 80.57 mil millones USD  |
+| 2024 | Importaciones | 97.95 mil millones USD  |
+| 2025 | Exportaciones | 88.79 mil millones USD  |
+| 2025 | Importaciones | 112.01 mil millones USD |
+
+Exportaciones e importaciones totales de Marruecos (2021-2025)
+
+``` r
+g_comercio_total <- ggplot(comercio_total, aes(x = year, y = total * 1000, color = flujo)) +
+  geom_line(linewidth = 1.2) + geom_point(size = 2.3) +
+  scale_color_manual(values = c("Exportaciones" = "#1b4965", "Importaciones" = "#c1121f")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-9, suffix = " mil M USD")) +
+  labs(title = "Evolución del comercio exterior de Marruecos",
+       subtitle = "Exportaciones e importaciones totales, 2021-2025",
+       x = "Año", y = NULL, color = NULL) +
+  theme_tp1()
+g_comercio_total
+```
+
+<figure>
+<img
+src="TP1---Indicadores-de-Comercio-Internacional--Marruecos_files/figure-gfm/comercio_total-1.png"
+alt="Evolución del comercio exterior de Marruecos" />
+<figcaption aria-hidden="true">Evolución del comercio exterior de
+Marruecos</figcaption>
+</figure>
+
+``` r
+ggsave(paste0(ruta_graficos, "grafico_comercio_total.png"), g_comercio_total,
+       width = 10, height = 6, dpi = 300, bg = "white")
+```
+
+``` r
+saldo_comercial <- comercio_total |>
+  select(year, flujo, total) |>
+  pivot_wider(names_from = flujo, values_from = total) |>
+  mutate(saldo = Exportaciones - Importaciones, saldo_fmt = formatear_valor(saldo))
+
+knitr::kable(saldo_comercial |> select(year, saldo_fmt),
+             col.names = c("Año", "Saldo comercial"),
+             caption = "Saldo comercial de Marruecos, 2021-2025 (negativo = déficit)")
+```
+
+|  Año | Saldo comercial        |
+|-----:|:-----------------------|
+| 2021 | -22 092.4 millones USD |
+| 2022 | -30 394.2 millones USD |
+| 2023 | -28 182.2 millones USD |
+| 2024 | -17 384.5 millones USD |
+| 2025 | -23 222.3 millones USD |
+
+Saldo comercial de Marruecos, 2021-2025 (negativo = déficit)
+
+``` r
+g_saldo <- ggplot(saldo_comercial, aes(x = year, y = saldo * 1000)) +
+  geom_col(fill = "#780000") +
+  geom_hline(yintercept = 0, color = "gray30", linewidth = 0.4) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-9, suffix = " mil M USD")) +
+  labs(title = "Saldo comercial de Marruecos",
+       subtitle = "Exportaciones − Importaciones, 2021-2025",
+       x = "Año", y = NULL) +
+  theme_tp1()
+g_saldo
+```
+
+<figure>
+<img
+src="TP1---Indicadores-de-Comercio-Internacional--Marruecos_files/figure-gfm/saldo_comercial-1.png"
+alt="Saldo comercial de Marruecos" />
+<figcaption aria-hidden="true">Saldo comercial de Marruecos</figcaption>
+</figure>
+
+``` r
+ggsave(paste0(ruta_graficos, "grafico_saldo_comercial.png"), g_saldo,
+       width = 10, height = 6, dpi = 300, bg = "white")
+```
+
 ### Principales socios comerciales
 
 ``` r
@@ -168,6 +317,143 @@ knitr::kable(top_socios |> select(p, total_fmt),
 | HKG   | 733.1 millones USD     |
 
 Top 15 socios comerciales de Marruecos por exportaciones (2024)
+
+``` r
+ranking_paises_imp <- mar_imp |>
+  filter(p != "WLD", year == 2024) |>
+  group_by(p) |>
+  summarise(total = first(total_impo)) |>
+  arrange(desc(total)) |>
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
+
+knitr::kable(ranking_paises_imp |> select(p, total_fmt),
+             col.names = c("Socio", "Importaciones"),
+             caption = "Top 15 socios comerciales de Marruecos por importaciones (2024)")
+```
+
+| Socio | Importaciones          |
+|:------|:-----------------------|
+| ESP   | 16.41 mil millones USD |
+| CHN   | 10.45 mil millones USD |
+| FRA   | 10.32 mil millones USD |
+| USA   | 8.76 mil millones USD  |
+| DEU   | 5.27 mil millones USD  |
+| ITA   | 4.44 mil millones USD  |
+| PRT   | 3.06 mil millones USD  |
+| SAU   | 2.87 mil millones USD  |
+| BRA   | 1.97 mil millones USD  |
+| ROM   | 1.93 mil millones USD  |
+| ARE   | 1.73 mil millones USD  |
+| IND   | 1.70 mil millones USD  |
+| BEL   | 1.66 mil millones USD  |
+| EGY   | 1.34 mil millones USD  |
+| GBR   | 1.16 mil millones USD  |
+
+Top 15 socios comerciales de Marruecos por importaciones (2024)
+
+### Principales países por bien
+
+Para cada uno de los principales bienes exportados e importados, se
+desglosan los 4 países que más participación tienen en ese comercio
+puntual, agrupando el resto en “Otros”.
+
+``` r
+desglose_pais <- function(cuci_code, flow_code, total_mundial) {
+  base <- comtrade_mar |>
+    filter(flow == flow_code, year == 2024, cuci == cuci_code, p != "WLD")
+  top_p <- base |> slice_max(value, n = n_paises) |> select(p, value)
+  resto <- total_mundial - sum(top_p$value, na.rm = TRUE)
+  bind_rows(top_p, tibble(p = "Otros", value = pmax(resto, 0))) |>
+    mutate(pct = round(value / total_mundial * 100, 1), value_fmt = formatear_valor(value))
+}
+```
+
+``` r
+tabla_paises_exp <- pmap_dfr(
+  top_bienes_exp |> select(cuci, cuci_desc, value),
+  function(cuci, cuci_desc, value) {
+    desglose_pais(cuci, "Export", value) |> mutate(cuci_desc = cuci_desc, .before = 1)
+  }
+)
+
+knitr::kable(tabla_paises_exp |> select(cuci_desc, p, value_fmt, pct),
+             col.names = c("Bien", "País", "Valor", "% del total"),
+             caption = "Principales países de destino de los bienes más exportados (2024)")
+```
+
+| Bien                     | País  | Valor                 | % del total |
+|:-------------------------|:------|:----------------------|------------:|
+| Passenger cars etc       | FRA   | 3.64 mil millones USD |        28.5 |
+| Passenger cars etc       | ITA   | 2.45 mil millones USD |        19.1 |
+| Passenger cars etc       | ESP   | 1.27 mil millones USD |         9.9 |
+| Passenger cars etc       | DEU   | 1.22 mil millones USD |         9.5 |
+| Passenger cars etc       | Otros | 4.21 mil millones USD |        32.9 |
+| Manufactured fertilizers | BRA   | 2.40 mil millones USD |        19.0 |
+| Manufactured fertilizers | IND   | 1.63 mil millones USD |        12.9 |
+| Manufactured fertilizers | AUS   | 825.0 millones USD    |         6.5 |
+| Manufactured fertilizers | ARG   | 634.9 millones USD    |         5.0 |
+| Manufactured fertilizers | Otros | 7.14 mil millones USD |        56.5 |
+| Electrical distrib equip | ESP   | 3.58 mil millones USD |        33.1 |
+| Electrical distrib equip | FRA   | 2.20 mil millones USD |        20.3 |
+| Electrical distrib equip | DEU   | 1.17 mil millones USD |        10.8 |
+| Electrical distrib equip | GBR   | 1.11 mil millones USD |        10.3 |
+| Electrical distrib equip | Otros | 2.76 mil millones USD |        25.5 |
+| Women/girl clothing wven | ESP   | 3.38 mil millones USD |        79.0 |
+| Women/girl clothing wven | FRA   | 433.3 millones USD    |        10.1 |
+| Women/girl clothing wven | ITA   | 131.4 millones USD    |         3.1 |
+| Women/girl clothing wven | GBR   | 117.3 millones USD    |         2.7 |
+| Women/girl clothing wven | Otros | 217.5 millones USD    |         5.1 |
+| Motor veh parts/access   | ESP   | 1.28 mil millones USD |        37.3 |
+| Motor veh parts/access   | FRA   | 729.5 millones USD    |        21.2 |
+| Motor veh parts/access   | DEU   | 323.7 millones USD    |         9.4 |
+| Motor veh parts/access   | USA   | 311.9 millones USD    |         9.1 |
+| Motor veh parts/access   | Otros | 792.5 millones USD    |        23.0 |
+
+Principales países de destino de los bienes más exportados (2024)
+
+``` r
+tabla_paises_imp <- pmap_dfr(
+  top_bienes_imp |> select(cuci, cuci_desc, value),
+  function(cuci, cuci_desc, value) {
+    desglose_pais(cuci, "Import", value) |> mutate(cuci_desc = cuci_desc, .before = 1)
+  }
+)
+
+knitr::kable(tabla_paises_imp |> select(cuci_desc, p, value_fmt, pct),
+             col.names = c("Bien", "País", "Valor", "% del total"),
+             caption = "Principales países de origen de los bienes más importados (2024)")
+```
+
+| Bien                     | País  | Valor                 | % del total |
+|:-------------------------|:------|:----------------------|------------:|
+| Heavy petrol/bitum oils  | ESP   | 1.97 mil millones USD |        25.5 |
+| Heavy petrol/bitum oils  | SAU   | 1.66 mil millones USD |        21.4 |
+| Heavy petrol/bitum oils  | USA   | 763.7 millones USD    |         9.9 |
+| Heavy petrol/bitum oils  | ITA   | 532.8 millones USD    |         6.9 |
+| Heavy petrol/bitum oils  | Otros | 2.82 mil millones USD |        36.4 |
+| Motor veh parts/access   | ESP   | 1.83 mil millones USD |        28.5 |
+| Motor veh parts/access   | FRA   | 1.58 mil millones USD |        24.6 |
+| Motor veh parts/access   | ROM   | 846.1 millones USD    |        13.2 |
+| Motor veh parts/access   | PRT   | 562.3 millones USD    |         8.8 |
+| Motor veh parts/access   | Otros | 1.60 mil millones USD |        25.0 |
+| Electrical distrib equip | DEU   | 834.9 millones USD    |        21.8 |
+| Electrical distrib equip | ESP   | 586.8 millones USD    |        15.4 |
+| Electrical distrib equip | FRA   | 519.8 millones USD    |        13.6 |
+| Electrical distrib equip | PRT   | 465.1 millones USD    |        12.2 |
+| Electrical distrib equip | Otros | 1.42 mil millones USD |        37.0 |
+| Aircraft/spacecraft/etc  | USA   | 2.08 mil millones USD |        69.5 |
+| Aircraft/spacecraft/etc  | FRA   | 724.0 millones USD    |        24.2 |
+| Aircraft/spacecraft/etc  | GBR   | 65.3 millones USD     |         2.2 |
+| Aircraft/spacecraft/etc  | ESP   | 29.3 millones USD     |         1.0 |
+| Aircraft/spacecraft/etc  | Otros | 96.3 millones USD     |         3.2 |
+| Electric circuit equipmt | ESP   | 985.5 millones USD    |        33.5 |
+| Electric circuit equipmt | FRA   | 801.1 millones USD    |        27.3 |
+| Electric circuit equipmt | DEU   | 250.6 millones USD    |         8.5 |
+| Electric circuit equipmt | CHN   | 209.5 millones USD    |         7.1 |
+| Electric circuit equipmt | Otros | 692.9 millones USD    |        23.6 |
+
+Principales países de origen de los bienes más importados (2024)
 
 ### Destino de los fertilizantes (hallazgo clave del TP)
 
@@ -776,17 +1062,3 @@ Brasil</figcaption>
 ``` r
 ggsave(paste0(ruta_graficos, "bubble_BRA.png"), p_bra, width = 10, height = 6.5, dpi = 300, bg = "white")
 ```
-
-## Conclusiones
-
-Marruecos muestra una ventaja comparativa muy marcada en fertilizantes
-(crudos y manufacturados), impulsada por su posición como principal
-exportador mundial de fosfatos. Sin embargo, este producto no es el que
-domina la relación bilateral con España pese a ser su principal socio
-comercial: el comercio con España está traccionado por manufacturas
-ligadas a cadenas de valor europeas (textiles, equipos eléctricos y
-autopartes), mientras que los fertilizantes se dirigen mayoritariamente
-a otros mercados como Brasil e India. A nivel agregado (2 dígitos), la
-industria automotriz y de equipos eléctricos superan en volumen a los
-fertilizantes, reflejando una integración industrial diversificada que
-convive con la especialización tradicional en fosfatos.

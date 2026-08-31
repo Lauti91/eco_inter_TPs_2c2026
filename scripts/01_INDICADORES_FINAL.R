@@ -49,11 +49,7 @@ theme_tp1 <- function(base_size = 13) {
 # BLOQUE 0.5: FORMATO DE VALORES MONETARIOS
 #===============================================================================#
 
-# El campo "value" de WITS viene en MILES de USD (TradeValueIn1000USD).
-# Esta función lo pasa a una unidad legible en el idioma del TP, para evitar
-# el error de lectura que tuvimos en el chat (leer "18209308" como si ya
-# fueran dólares, cuando en realidad son 18.209.308 MILES de USD = 18,21 mil
-# millones de USD).
+
 formatear_valor <- function(valor_miles_usd, digits_grandes = 2, digits_chicos = 1) {
   valor_usd <- valor_miles_usd * 1000
   dplyr::if_else(
@@ -132,7 +128,13 @@ wld_exp <- comtrade_wld |>
 # BLOQUE 2: PERFIL DE COMERCIO EXTERIOR (punto 2 de la consigna)
 #===============================================================================#
 
-# Ranking real de socios comerciales de Marruecos (exportaciones, 2024)
+# Parámetros del bloque: cantidad de bienes/países a mostrar en cada desglose
+n_bienes <- 5
+n_paises <- 4
+
+# Ranking real de socios comerciales de Marruecos por EXPORTACIONES (2024)
+# (se reutiliza más abajo, en 2.4, para el ranking país-a-país; evita
+# recalcular lo mismo dos veces con otro nombre)
 top_socios <- mar_exp |>
   filter(p != "WLD", year == 2024) |>
   group_by(p) |>
@@ -279,6 +281,105 @@ g_composicion <- ggplot(detalle_apilado, aes(x = reorder(desc_2d, ymax, max))) +
 g_composicion
 ggsave(paste0(ruta_graficos, "grafico_composicion_2dig.png"), g_composicion,
        width = 10, height = 6.5, dpi = 300, bg = "white")
+
+
+## --- 2.1: Principales bienes exportados e importados (3 dígitos) ---
+
+top_bienes_exp <- mar_exp |>
+  filter(p == "WLD", year == 2024) |>
+  select(cuci, cuci_desc, value) |>
+  slice_max(value, n = n_bienes) |>
+  mutate(flow = "Exportado", value_fmt = formatear_valor(value))
+
+top_bienes_imp <- mar_imp |>
+  filter(p == "WLD", year == 2024) |>
+  select(cuci, cuci_desc, value) |>
+  slice_max(value, n = n_bienes) |>
+  mutate(flow = "Importado", value_fmt = formatear_valor(value))
+
+top_bienes_exp
+top_bienes_imp
+
+## --- 2.2: Montos totales de expos/impos (WLD) + evolución + saldo ---
+
+comercio_total <- bind_rows(
+  mar_exp |> filter(p == "WLD") |> distinct(year, total_expo) |> rename(total = total_expo) |> mutate(flujo = "Exportaciones"),
+  mar_imp |> filter(p == "WLD") |> distinct(year, total_impo) |> rename(total = total_impo) |> mutate(flujo = "Importaciones")
+) |>
+  mutate(total_fmt = formatear_valor(total))
+
+comercio_total
+
+saldo_comercial <- comercio_total |>
+  select(year, flujo, total) |>
+  pivot_wider(names_from = flujo, values_from = total) |>
+  mutate(saldo = Exportaciones - Importaciones, saldo_fmt = formatear_valor(saldo))
+
+saldo_comercial
+
+g_comercio_total <- ggplot(comercio_total, aes(x = year, y = total * 1000, color = flujo)) +
+  geom_line(linewidth = 1.2) + geom_point(size = 2.3) +
+  scale_color_manual(values = c("Exportaciones" = "#1b4965", "Importaciones" = "#c1121f")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-9, suffix = " mil M USD")) +
+  labs(title = "Evolución del comercio exterior de Marruecos",
+       subtitle = "Exportaciones e importaciones totales, 2021-2025",
+       x = "Año", y = NULL, color = NULL) +
+  theme_tp1()
+g_comercio_total
+ggsave(paste0(ruta_graficos, "grafico_comercio_total.png"), g_comercio_total,
+       width = 10, height = 6, dpi = 300, bg = "white")
+
+g_saldo <- ggplot(saldo_comercial, aes(x = year, y = saldo * 1000)) +
+  geom_col(fill = "#780000") +
+  geom_hline(yintercept = 0, color = "gray30", linewidth = 0.4) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-9, suffix = " mil M USD")) +
+  labs(title = "Saldo comercial de Marruecos",
+       subtitle = "Exportaciones − Importaciones, 2021-2025",
+       x = "Año", y = NULL) +
+  theme_tp1()
+g_saldo
+ggsave(paste0(ruta_graficos, "grafico_saldo_comercial.png"), g_saldo,
+       width = 10, height = 6, dpi = 300, bg = "white")
+
+## --- 2.3: Principales países a los que Marruecos les compra/vende cada bien ---
+
+desglose_pais <- function(cuci_code, flow_code, total_mundial) {
+  base <- comtrade_mar |>
+    filter(flow == flow_code, year == 2024, cuci == cuci_code, p != "WLD")
+  top_p <- base |> slice_max(value, n = n_paises) |> select(p, value)
+  resto <- total_mundial - sum(top_p$value, na.rm = TRUE)
+  bind_rows(top_p, tibble(p = "Otros", value = pmax(resto, 0))) |>
+    mutate(pct = round(value / total_mundial * 100, 1), value_fmt = formatear_valor(value))
+}
+
+tabla_paises_exp <- pmap_dfr(
+  top_bienes_exp |> select(cuci, cuci_desc, value),
+  function(cuci, cuci_desc, value) {
+    desglose_pais(cuci, "Export", value) |> mutate(cuci_desc = cuci_desc, .before = 1)
+  }
+)
+tabla_paises_exp
+
+tabla_paises_imp <- pmap_dfr(
+  top_bienes_imp |> select(cuci, cuci_desc, value),
+  function(cuci, cuci_desc, value) {
+    desglose_pais(cuci, "Import", value) |> mutate(cuci_desc = cuci_desc, .before = 1)
+  }
+)
+tabla_paises_imp
+
+## --- 2.4: Ranking de países (exportaciones e importaciones totales) ---
+## El ranking exportador (top_socios) ya se calculó al inicio del Bloque 2;
+## acá solo se agrega el equivalente del lado importador.
+
+ranking_paises_imp <- mar_imp |>
+  filter(p != "WLD", year == 2024) |>
+  group_by(p) |>
+  summarise(total = first(total_impo)) |>
+  arrange(desc(total)) |>
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
+ranking_paises_imp
 
 
 #===============================================================================#
