@@ -4,10 +4,9 @@
 # Repositorio: eco_inter_TPs_2c2026
 #===============================================================================#
 
-install.packages("RColorBrewer", repos = "https://cloud.r-project.org")
-install.packages("scales", repos = "https://cloud.r-project.org")
-library(scales)
-library(RColorBrewer)
+if (!requireNamespace("RColorBrewer", quietly = TRUE)) install.packages("RColorBrewer", repos = "https://cloud.r-project.org")
+if (!requireNamespace("scales", quietly = TRUE)) install.packages("scales", repos = "https://cloud.r-project.org")
+
 library(tidyverse)
 library(haven)
 library(ggrepel)
@@ -44,6 +43,24 @@ theme_tp1 <- function(base_size = 13) {
       panel.grid.major = element_line(color = "gray92", linewidth = 0.3),
       strip.text = element_text(face = "bold", size = base_size - 1)
     )
+}
+
+#===============================================================================#
+# BLOQUE 0.5: FORMATO DE VALORES MONETARIOS
+#===============================================================================#
+
+# El campo "value" de WITS viene en MILES de USD (TradeValueIn1000USD).
+# Esta función lo pasa a una unidad legible en el idioma del TP, para evitar
+# el error de lectura que tuvimos en el chat (leer "18209308" como si ya
+# fueran dólares, cuando en realidad son 18.209.308 MILES de USD = 18,21 mil
+# millones de USD).
+formatear_valor <- function(valor_miles_usd, digits_grandes = 2, digits_chicos = 1) {
+  valor_usd <- valor_miles_usd * 1000
+  dplyr::if_else(
+    valor_usd >= 1e9,
+    paste0(scales::number(valor_usd / 1e9, accuracy = 10^-digits_grandes), " mil millones USD"),
+    paste0(scales::number(valor_usd / 1e6, accuracy = 10^-digits_chicos), " millones USD")
+  )
 }
 
 
@@ -84,6 +101,9 @@ distinct(comtrade_socios, r); nrow(comtrade_socios)
 comtrade_wld <- limpiar_wits(paste0(ruta_datos, "WLD_WLD.dta"), incluir_desc = FALSE)
 distinct(comtrade_wld, r, p)
 
+# Reporter = MAR, Partner = WLD, nomenclatura a 2 dígitos (división)
+comtrade_2dig <- limpiar_wits(paste0(ruta_datos, "MAR_2DIG_WLD.dta"))
+
 # Bases de trabajo derivadas
 mar_exp <- comtrade_mar |>
   filter(flow == "Export") |>
@@ -118,7 +138,8 @@ top_socios <- mar_exp |>
   group_by(p) |>
   summarise(total = first(total_expo)) |>
   arrange(desc(total)) |>
-  slice_max(total, n = 15)
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
 
 top_socios
 
@@ -128,16 +149,71 @@ destino_fertilizantes <- comtrade_mar |>
   group_by(p, cuci_desc) |>
   summarise(total = sum(value, na.rm = TRUE), .groups = "drop") |>
   arrange(desc(total)) |>
-  slice_max(total, n = 15)
+  slice_max(total, n = 15) |>
+  mutate(total_fmt = formatear_valor(total))
 
 destino_fertilizantes
+
+# Lookup de descripciones a nivel 2 dígitos (división SITC)
+lookup_2dig <- comtrade_2dig |>
+  filter(r == "MAR", p == "WLD") |>
+  distinct(cuci, cuci_desc) |>
+  rename(cuci_2d = cuci, desc_2d = cuci_desc)
+
+# Principales divisiones exportadoras e importadoras a 2 dígitos
+sectores_2dig_exp <- mar_exp |>
+  filter(p == "WLD", year == 2024) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  group_by(cuci_2d) |>
+  summarise(total = sum(value, na.rm = TRUE)) |>
+  arrange(desc(total)) |>
+  slice_max(total, n = 5) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  relocate(desc_2d, .after = cuci_2d) |>
+  mutate(total_fmt = formatear_valor(total))
+
+sectores_2dig_exp
+
+sectores_2dig_imp <- mar_imp |>
+  filter(p == "WLD", year == 2024) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  group_by(cuci_2d) |>
+  summarise(total = sum(value, na.rm = TRUE)) |>
+  arrange(desc(total)) |>
+  slice_max(total, n = 5) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  relocate(desc_2d, .after = cuci_2d) |>
+  mutate(total_fmt = formatear_valor(total))
+
+sectores_2dig_imp
+
+# Rankeamos cada producto (3 dígitos) dentro de su propia división (2 dígitos)
+# 1 = el más grande de esa división
+detalle_composicion <- mar_exp |>
+  filter(p == "WLD", year == 2024, substr(cuci, 1, 2) %in% sectores_2dig_exp$cuci_2d) |>
+  mutate(cuci_2d = substr(cuci, 1, 2)) |>
+  left_join(lookup_2dig, by = "cuci_2d") |>
+  group_by(cuci_2d) |>
+  mutate(
+    rank_en_division = rank(-value, ties.method = "first"),
+    pct_division = value / sum(value) * 100
+  ) |>
+  ungroup() |>
+  mutate(
+    categoria_rank = case_when(
+      rank_en_division == 1 ~ "Producto principal",
+      rank_en_division == 2 ~ "2° producto",
+      rank_en_division == 3 ~ "3° producto",
+      TRUE ~ "Resto"
+    )
+  )
 
 orden_apilado <- c("Resto", "3° producto", "2° producto", "Producto principal")
 
 detalle_composicion <- detalle_composicion |>
   mutate(categoria_rank = factor(categoria_rank, levels = orden_apilado))
 
-# acumulado por división
+# Acumulado por división (posiciones reales del apilado, para ubicar labels)
 detalle_apilado <- detalle_composicion |>
   arrange(desc_2d, categoria_rank) |>
   group_by(desc_2d) |>
@@ -153,7 +229,8 @@ etiquetas_top <- detalle_apilado |>
   filter(rank_en_division == 1) |>
   mutate(label_completo = paste0(round(pct_division), "%"))
 
-# Totales por división
+# Totales por división (ya en millones de USD: total viene en miles de USD,
+# dividir por 1000 da directamente millones — no requiere formatear_valor)
 totales_division <- detalle_apilado |>
   group_by(desc_2d) |>
   summarise(total = max(ymax), .groups = "drop")
@@ -228,7 +305,10 @@ top_volumen <- mar_exp |>
   filter(p == "WLD", year == 2024) |>
   select(cuci, cuci_desc, value) |>
   arrange(desc(value)) |>
-  slice_max(value, n = 12)
+  slice_max(value, n = 12) |>
+  mutate(value_fmt = formatear_valor(value))
+
+top_volumen
 
 interseccion_vol_vcr <- intersect(top_volumen$cuci, top_ventaja$cuci)
 length(interseccion_vol_vcr); interseccion_vol_vcr
@@ -286,7 +366,7 @@ iic_heatmap <- map_dfr(socios_finales, function(s) {
 # Completamos la grilla (evita huecos cuando un producto no tiene comercio con algún socio)
 iic_heatmap_completo <- iic_heatmap |>
   tidyr::complete(socio = socios_finales, cuci, fill = list(iic = 0)) |>
-  select(-cuci_desc) |>   # <- esta línea es la que faltaba
+  select(-cuci_desc) |>
   left_join(iic_heatmap |> distinct(cuci, cuci_desc), by = "cuci")
 
 iic_heatmap_cat <- iic_heatmap_completo |>
@@ -433,7 +513,9 @@ graficar_bubble <- function(socio_code, iic_min = 0.02, n_extra = 3) {
     theme_tp1()
 }
 
-# Umbral de IIC ajustado por socio (Alemania necesita uno más permisivo, ver detalle en el chat)
+# Umbral de IIC ajustado por socio (Alemania necesita uno más permisivo porque
+# su comercio bilateral con Marruecos está más disperso entre muchos productos
+# de bajo valor unitario; con 0.02 casi no quedaban puntos para graficar)
 umbrales_iic <- c(ESP = 0.02, FRA = 0.02, DEU = 0.001, USA = 0.02, BRA = 0.02)
 
 for (s in names(umbrales_iic)) {
@@ -442,3 +524,4 @@ for (s in names(umbrales_iic)) {
   ggsave(paste0(ruta_graficos, "bubble_", s, ".png"), plot = p,
          width = 10, height = 6.5, dpi = 300, bg = "white")
 }
+
