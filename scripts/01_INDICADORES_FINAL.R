@@ -1,7 +1,6 @@
 #===============================================================================#
-# TP1 - Economía Internacional: SCRIPT FINAL
+# TP1 - Economía Internacional
 # Marruecos, 2021-2025
-# Repositorio: eco_inter_TPs_2c2026
 #===============================================================================#
 
 if (!requireNamespace("RColorBrewer", quietly = TRUE)) install.packages("RColorBrewer", repos = "https://cloud.r-project.org")
