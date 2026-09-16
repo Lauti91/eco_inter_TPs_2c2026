@@ -299,10 +299,10 @@ g_fpp <- ggplot() +
   labs(title = "FPP empírica de Marruecos: fosfatos vs. automotor",
        subtitle = paste0("Curva calibrada con Cobb-Douglas sobre L = ", format(L_total, big.mark = "."),
                           " trabajadores (", anio_ref_fpp, "); puntos = producción observada por año"),
-       x = "Producción de fosfatos (fosfatos_produccion$produccion_mt)",
+       x = "Producción de fosfatos (miles de toneladas)",
        y = "Producción automotriz (unidades)",
        color = "Año observado",
-       caption = "Curva calibrada con alpha de io_coeficientes (HCP); puntos de fosfatos_produccion/auto_produccion.") +
+       caption = "Curva calibrada con alpha de io_coeficientes (HCP) sobre fosfatos_produccion$produccion_mt / auto_produccion$unidades; el punto 2023 coincide con la curva por ser el año de calibración.") +
   theme_tp1()
 g_fpp
 ggsave(paste0(ruta_graficos, "grafico_fpp_real.png"), g_fpp, width = 10, height = 7, dpi = 300, bg = "white")
@@ -341,12 +341,17 @@ g_caja_asignacion <- ggplot(caja_asignacion, aes(x = L_fosfatos)) +
   geom_line(aes(y = vpmgl_auto, color = "Automotor"), linewidth = 1.1) +
   geom_vline(xintercept = L_fosfatos_eq, linetype = "dashed", color = "gray40") +
   geom_hline(yintercept = w_equilibrio, linetype = "dashed", color = "gray40") +
+  coord_cartesian(ylim = c(0, 2)) +  # recorta las colas asintóticas (PMgL -> Inf
+                                      # cuando el trabajo de un sector -> 0) para
+                                      # que el cruce se vea con detalle; ver nota
+                                      # de la caption sobre lo que queda afuera
   scale_color_manual(values = paleta_sectores) +
   labs(title = "Caja de asignación del trabajo — MFE",
-       subtitle = paste0("Salario de equilibrio w* en L_fosfatos \u2248 ", round(L_fosfatos_eq)),
+       subtitle = paste0("Salario de equilibrio w* \u2248 ", round(w_equilibrio, 3),
+                          " en L_fosfatos \u2248 ", round(L_fosfatos_eq)),
        x = "Trabajo asignado a fosfatos (L_fosfatos)", y = "VPMgL (precio implícito × PMgL)",
        color = NULL,
-       caption = "Precio implícito = ingreso/exportación total ÷ producción física del año de referencia. Verificar unidades (ver comentario arriba) antes de citar w* en la presentación.") +
+       caption = "Precio implícito = ingreso/exportación total ÷ producción física del año de referencia. Curvas recortadas en VPMgL=2 (la divergencia hacia los extremos es un artefacto esperado del Cobb-Douglas, no un error). Verificar unidades (ver comentario arriba) antes de citar w* en la presentación.") +
   theme_tp1()
 g_caja_asignacion
 ggsave(paste0(ruta_graficos, "grafico_caja_asignacion.png"), g_caja_asignacion,
