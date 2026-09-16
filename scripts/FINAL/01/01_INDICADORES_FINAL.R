@@ -661,3 +661,16 @@ for (nombre in names(tablas_finales)) {
   write_csv(tablas_finales[[nombre]], paste0(ruta_tablas, nombre, ".csv"))
 }
 
+
+#===============================================================================#
+# BLOQUE 8: OBJETOS LIVIANOS PARA HEREDAR EN OTROS TPs
+#===============================================================================#
+# El TP2 (y los que sigan) heredan objetos de este script vía source(), lo
+# que obliga a reprocesar las bases .dta de WITS y regenerar los 14 gráficos
+# cada vez. Guardar acá los objetos puntuales que necesitan los TPs
+# siguientes permite que carguen esto en menos de un segundo con load() en
+# vez de correr todo el script - ver el header de scripts/PRUEBAS/02/02_MFE_HO.R.
+
+save(vcr_mar, iic_heatmap_completo, mar_exp, theme_tp1,
+     file = paste0(ruta_tablas, "objetos_heredados_tp1.RData"))
+

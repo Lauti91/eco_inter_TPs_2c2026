@@ -10,13 +10,26 @@
 # pide la consigna (MFE y HO), con sub-bloques adentro de cada uno, en vez de
 # alrededor de las fuentes de datos. Sigue sin estar corrido ni validado en R
 # (se escribió sin acceso a R para probarlo) - revisar nombres de columnas de
-# pwt10.01 al cargarlo la primera vez. Pendiente además: dar justificación
-# empírica (con datos tratados en código) de por qué cada sector se toma como
-# intensivo en el factor que se le asigna, y armar la FPP real de Marruecos
-# con los dos sectores seleccionados - ninguna de las dos cosas está resuelta
-# todavía en esta versión.
+# pwt10.01 al cargarlo la primera vez.
+#
+# Incorpora la devolución de Gemini Spark sobre este mismo borrador: la FPP
+# real en el plano (Q_fosfatos, Q_automotor) y la caja de asignación con
+# VPMgL (2.3/2.4), y la justificación empírica de las intensidades
+# factoriales calculada en código en vez de asumida (3.1). Ver BLOQUE 5 para
+# lo que sigue abierto incluso después de esto (en particular, la variante
+# con OECD TiVA/ICIO que propuso Gemini para calcular alpha directamente
+# desde Valor Agregado/Remuneración de asalariados, en vez de vía
+# io_coeficientes del HCP).
 
-source("scripts/FINAL/01/01_INDICADORES_FINAL.R", print.eval = FALSE)
+objetos_tp1 <- "output/tablas/01/objetos_heredados_tp1.RData"
+if (file.exists(objetos_tp1)) {
+  load(objetos_tp1)
+} else {
+  # Fallback si todavía no se corrió el TP1 con el guardado de objetos
+  # livianos del BLOQUE 8 de 01_INDICADORES_FINAL.R (más lento: reprocesa
+  # las bases .dta de WITS y regenera los 14 gráficos del TP1).
+  source("scripts/FINAL/01/01_INDICADORES_FINAL.R", print.eval = FALSE)
+}
 # print.eval = FALSE evita reintentar mostrar cada gráfico del TP1 en pantalla
 # durante el source() (causa típica de "Viewport has zero dimension(s)" si el
 # panel de Plots está colapsado). No afecta los ggsave() del TP1.
@@ -175,16 +188,15 @@ io_coeficientes <- tibble(
   mutate(capital_va_medio = (capital_va_min + capital_va_max) / 2,
          trabajo_va_medio = (trabajo_va_min + trabajo_va_max) / 2)
 
-## --- 2.2 FPP cóncava y PMgL decreciente: calibración empírica (Cobb-Douglas) ---
+## --- 2.2 Evolución temporal de la productividad media del trabajo ---
 # Con io_coeficientes (participación del capital en el VA de cada rama) más
 # las series de producción física y empleo, se puede aproximar la VPMgL de
 # cada sector sin necesitar la matriz insumo-producto completa: el share de
 # capital de las cuentas nacionales ES el alpha de un Cobb-Douglas simple
 # Y = A * F^alpha * L^(1-alpha).
-# PENDIENTE (ver encabezado del script): esto calibra el PMgL relativo de
-# cada sector por separado, pero todavía no arma la FPP real de Marruecos
-# (el par de curvas de producción posible entre los dos sectores) - falta
-# ese paso para cerrar el inciso b del Bloque 2 de la consigna.
+# Esto da la evolución en el tiempo de cada sector por separado (útil como
+# contexto histórico), pero NO es una FPP - una FPP se grafica en el plano
+# (Q_fosfatos, Q_automotor), no año a año. Para eso ver el sub-bloque 2.3.
 
 calcular_vpmgl_cobb_douglas <- function(produccion, empleo, alpha) {
   # produccion: tibble con year, <col_produccion>
@@ -231,7 +243,116 @@ g_productividad
 ggsave(paste0(ruta_graficos, "grafico_productividad_mfe.png"), g_productividad,
        width = 10, height = 6.5, dpi = 300, bg = "white")
 
-## --- 2.3 Shock de términos de intercambio ---
+## --- 2.3 La FPP real de Marruecos (plano Q_fosfatos x Q_automotor) ---
+# Calibración Cobb-Douglas simple por sector (Q = A * L^(1-alpha), con
+# alpha = participación del factor específico según io_coeficientes),
+# ajustando A para que cada sector reproduzca exactamente su producción
+# observada en el año de referencia con el empleo observado ese año. Con
+# eso se arma una grilla de asignación del trabajo móvil (L_fosfatos +
+# L_automotor = L_total fijo) que traza la curva cóncava de la FPP.
+#
+# IMPORTANTE: los puntos observados de otros años (2019, 2021, 2022...) NO
+# van a caer exactamente sobre esta curva, porque la curva fija L_total en
+# el nivel de anio_ref_fpp mientras que el empleo total efectivamente varió
+# año a año. Eso no es un error: mostrar esos puntos "por fuera" de la curva
+# calibrada en un año puntual es precisamente lo que ilustra que la FPP se
+# desplazó con el tiempo (acumulación de capital vía IED en Tánger/Kenitra),
+# no solo que la economía se movió a lo largo de una FPP fija.
+
+anio_ref_fpp <- 2023  # último año con las cuatro series (producción y
+                       # empleo de ambos sectores) simultáneamente completas
+
+L_fosfatos_0 <- ocp_empleo_serie$empleo[ocp_empleo_serie$year == anio_ref_fpp]
+L_auto_0     <- auto_empleo_serie$empleo[auto_empleo_serie$year == anio_ref_fpp]
+L_total      <- L_fosfatos_0 + L_auto_0
+
+Q_fosfatos_0 <- fosfatos_produccion$produccion_mt[fosfatos_produccion$year == anio_ref_fpp]
+Q_auto_0     <- auto_produccion$unidades[auto_produccion$year == anio_ref_fpp]
+
+alpha_fosfatos <- io_coeficientes$capital_va_medio[io_coeficientes$rama == "Minería/fosfatos (B00)"]
+alpha_auto     <- io_coeficientes$capital_va_medio[io_coeficientes$rama == "Automotor/IMME (C00)"]
+
+A_fosfatos <- Q_fosfatos_0 / (L_fosfatos_0 ^ (1 - alpha_fosfatos))
+A_auto     <- Q_auto_0     / (L_auto_0     ^ (1 - alpha_auto))
+
+fpp_grilla <- tibble(
+  L_fosfatos = seq(1000, L_total - 1000, length.out = 300)
+) |>
+  mutate(
+    L_auto     = L_total - L_fosfatos,
+    Q_fosfatos = A_fosfatos * L_fosfatos ^ (1 - alpha_fosfatos),
+    Q_auto     = A_auto     * L_auto     ^ (1 - alpha_auto)
+  )
+
+# Puntos observados en los años con datos completos de ambas producciones,
+# para mostrar el desplazamiento de la economía a través del tiempo
+fpp_observado <- inner_join(
+  fosfatos_produccion |> rename(Q_fosfatos = produccion_mt),
+  auto_produccion |> rename(Q_auto = unidades),
+  by = "year"
+)
+
+g_fpp <- ggplot() +
+  geom_path(data = fpp_grilla, aes(x = Q_fosfatos, y = Q_auto), linewidth = 1.1, color = "gray30") +
+  geom_point(data = fpp_observado, aes(x = Q_fosfatos, y = Q_auto, color = factor(year)), size = 3) +
+  geom_text(data = fpp_observado, aes(x = Q_fosfatos, y = Q_auto, label = year), vjust = -1, size = 3) +
+  labs(title = "FPP empírica de Marruecos: fosfatos vs. automotor",
+       subtitle = paste0("Curva calibrada con Cobb-Douglas sobre L = ", format(L_total, big.mark = "."),
+                          " trabajadores (", anio_ref_fpp, "); puntos = producción observada por año"),
+       x = "Producción de fosfatos (fosfatos_produccion$produccion_mt)",
+       y = "Producción automotriz (unidades)",
+       color = "Año observado",
+       caption = "Curva calibrada con alpha de io_coeficientes (HCP); puntos de fosfatos_produccion/auto_produccion.") +
+  theme_tp1()
+g_fpp
+ggsave(paste0(ruta_graficos, "grafico_fpp_real.png"), g_fpp, width = 10, height = 7, dpi = 300, bg = "white")
+
+## --- 2.4 Caja de asignación del trabajo y salario de equilibrio (VPMgL) ---
+# Convierte el PMgL físico de 2.3 a valor monetario multiplicando por el
+# precio implícito de cada sector (ingreso/exportación total del año de
+# referencia ÷ producción física de ese año), para que ambas curvas queden
+# en la misma unidad y puedan graficarse juntas en la caja clásica de
+# asignación del trabajo del MFE.
+# VERIFICAR ANTES DE CITAR: confirmar que produccion_mt (fosfatos) y las
+# unidades de ingresos_mmad/total_mmad están en bases compatibles entre sí
+# antes de confiar en el nivel absoluto de precio_fosfatos/precio_auto o en
+# w_equilibrio - lo que sí es robusto sin esa verificación es la FORMA de
+# las dos curvas VPMgL (monótonas decrecientes) y que se cruzan una vez.
+
+precio_fosfatos <- ocp_financieros$ingresos_mmad[ocp_financieros$year == anio_ref_fpp] / Q_fosfatos_0
+precio_auto     <- auto_exportaciones_oc$total_mmad[auto_exportaciones_oc$year == anio_ref_fpp] / Q_auto_0
+
+caja_asignacion <- fpp_grilla |>
+  mutate(
+    pmgl_fosfatos  = (1 - alpha_fosfatos) * A_fosfatos * L_fosfatos ^ (-alpha_fosfatos),
+    pmgl_auto      = (1 - alpha_auto)     * A_auto     * L_auto     ^ (-alpha_auto),
+    vpmgl_fosfatos = precio_fosfatos * pmgl_fosfatos,
+    vpmgl_auto     = precio_auto     * pmgl_auto
+  )
+
+fila_equilibrio <- caja_asignacion |>
+  mutate(brecha = abs(vpmgl_fosfatos - vpmgl_auto)) |>
+  slice_min(brecha, n = 1)
+w_equilibrio  <- mean(c(fila_equilibrio$vpmgl_fosfatos, fila_equilibrio$vpmgl_auto))
+L_fosfatos_eq <- fila_equilibrio$L_fosfatos
+
+g_caja_asignacion <- ggplot(caja_asignacion, aes(x = L_fosfatos)) +
+  geom_line(aes(y = vpmgl_fosfatos, color = "Fosfatos"), linewidth = 1.1) +
+  geom_line(aes(y = vpmgl_auto, color = "Automotor"), linewidth = 1.1) +
+  geom_vline(xintercept = L_fosfatos_eq, linetype = "dashed", color = "gray40") +
+  geom_hline(yintercept = w_equilibrio, linetype = "dashed", color = "gray40") +
+  scale_color_manual(values = paleta_sectores) +
+  labs(title = "Caja de asignación del trabajo — MFE",
+       subtitle = paste0("Salario de equilibrio w* en L_fosfatos \u2248 ", round(L_fosfatos_eq)),
+       x = "Trabajo asignado a fosfatos (L_fosfatos)", y = "VPMgL (precio implícito × PMgL)",
+       color = NULL,
+       caption = "Precio implícito = ingreso/exportación total ÷ producción física del año de referencia. Verificar unidades (ver comentario arriba) antes de citar w* en la presentación.") +
+  theme_tp1()
+g_caja_asignacion
+ggsave(paste0(ruta_graficos, "grafico_caja_asignacion.png"), g_caja_asignacion,
+       width = 10, height = 6.5, dpi = 300, bg = "white")
+
+## --- 2.5 Shock de términos de intercambio ---
 tot_marruecos <- WDI(country = "MA", indicator = "TT.PRI.MRCH.XD.WD",
                      start = 2015, end = 2025) |>
   as_tibble() |>
@@ -270,7 +391,7 @@ g_precios
 ggsave(paste0(ruta_graficos, "grafico_precios_internacionales.png"), g_precios,
        width = 10, height = 6, dpi = 300, bg = "white")
 
-## --- 2.4 Efectos distributivos observados (salarios) ---
+## --- 2.6 Efectos distributivos observados (salarios) ---
 # Insumo para contrastar la predicción teórica de ganadores/perdedores del
 # MFE (inciso d) contra lo efectivamente ocurrido.
 salario_promedio_general <- tibble(
@@ -294,7 +415,43 @@ salarios_cnss_sector_2020 <- tibble(
 # relativa, patrón exportador predicho, y Stolper-Samuelson como contraparte
 # distributiva de largo plazo.
 
-## --- 3.1 Dotación factorial relativa (Penn World Tables) ---
+## --- 3.1 Justificación empírica de las intensidades factoriales ---
+# En vez de asumir directamente que fosfatos es intensivo en el factor
+# específico (tierra/capital) y automotor relativamente absorbente de
+# trabajo, se lo muestra con la brecha de valor generado por trabajador
+# entre ambos sectores, calculada acá de las series ya cargadas en 2.1 (no
+# copiada a mano). Es la variante "Opción A" de la devolución de Gemini
+# (facturación/trabajador); la "Opción B" -Valor Agregado y Remuneración de
+# Asalariados desde OECD TiVA/ICIO para Marruecos, sectores B y C29- daría
+# un alpha más riguroso que io_coeficientes pero requiere descargar esa base
+# aparte y no está implementada todavía (ver BLOQUE 5).
+
+productividad_valor_fosfatos <- inner_join(
+  ocp_financieros |> select(year, ingresos_mmad),
+  ocp_empleo_serie, by = "year"
+) |>
+  mutate(valor_por_trabajador_mmad = ingresos_mmad / empleo, sector = "Fosfatos")
+
+productividad_valor_auto <- inner_join(
+  auto_exportaciones_oc |> select(year, total_mmad),
+  auto_empleo_serie |> select(year, empleo), by = "year"
+) |>
+  mutate(valor_por_trabajador_mmad = total_mmad / empleo, sector = "Automotor")
+
+brecha_valor_trabajador <- bind_rows(
+  productividad_valor_fosfatos |> select(year, sector, valor_por_trabajador_mmad),
+  productividad_valor_auto     |> select(year, sector, valor_por_trabajador_mmad)
+) |>
+  pivot_wider(names_from = sector, values_from = valor_por_trabajador_mmad) |>
+  mutate(brecha_veces = Fosfatos / Automotor)
+
+brecha_valor_trabajador  # confirmar el orden de magnitud (esperado ~7x en
+                          # 2023, según el hallazgo de la ronda 2 de Spark):
+                          # respalda tomar fosfatos como intensivo en el
+                          # factor específico y automotor como el sector
+                          # relativamente absorbente de trabajo abundante.
+
+## --- 3.2 Dotación factorial relativa (Penn World Tables) ---
 data("pwt10.01", package = "pwt10")
 paises_benchmark <- c("Morocco", "Germany", "Spain", "France")
 
@@ -320,10 +477,6 @@ g_kl
 ggsave(paste0(ruta_graficos, "grafico_kl_benchmark.png"), g_kl,
        width = 10, height = 6.5, dpi = 300, bg = "white")
 # TODO: definir si el promedio UE es simple o ponderado (PBI/población).
-# PENDIENTE (ver encabezado del script): esto compara K/L pero todavía no
-# da justificación empírica explícita de por qué fosfatos se toma como
-# intensivo en tierra/capital y automotor en capital - falta ese argumento
-# para cerrar del todo el inciso b del Bloque 3.
 
 g_labsh <- pwt10.01 |>
   filter(country == "Morocco") |>
@@ -338,16 +491,17 @@ g_labsh
 ggsave(paste0(ruta_graficos, "grafico_labsh_marruecos.png"), g_labsh,
        width = 10, height = 6, dpi = 300, bg = "white")
 
-## --- 3.2 Requerimientos técnicos por rama (reutiliza io_coeficientes de 2.1) ---
+## --- 3.3 Requerimientos técnicos por rama (reutiliza io_coeficientes de 2.1) ---
 # Los mismos coeficientes de reparto del VA que sirvieron de alpha en el
-# Cobb-Douglas de 2.2 son, leídos al revés, una aproximación de los
+# Cobb-Douglas de 2.2/2.3 son, leídos al revés, una aproximación de los
 # requerimientos técnicos aL,j/aK,j que pide el estilo del Ejercicio 11 de
 # la guía teórica (ver io_coeficientes$trabajo_va_medio / capital_va_medio).
 # No reemplazan una matriz insumo-producto real por rama individual (no
 # existe en fuentes abiertas por secreto estadístico, Ley 371-71), pero son
-# el máximo nivel de detalle técnico disponible para HO.
+# el máximo nivel de detalle técnico disponible para HO, junto con la
+# brecha de valor por trabajador de 3.1.
 
-## --- 3.3 Origen del capital extranjero (movilidad de largo plazo) ---
+## --- 3.4 Origen del capital extranjero (movilidad de largo plazo) ---
 ied_stock_total <- tibble(
   year        = 2019:2024,
   stock_musd  = c(66500, 67500, 72994, 63278, 69297, 71500)
@@ -425,17 +579,23 @@ caisse_compensacion <- tibble(
 #    (minería vs. automotor puros, no IMME agregado) - no existe en fuentes
 #    abiertas por secreto estadístico (Ley 371-71). Los coeficientes
 #    agregados de io_coeficientes son el máximo nivel de detalle disponible
-#    y alcanzan para la calibración del Bloque 2.2 y la aproximación de 3.2.
+#    vía HCP y alcanzan para la calibración de 2.2/2.3/2.4 y la
+#    aproximación de 3.3.
 # 2. Salario CNSS específico de la sub-rama automotriz (vs. "Industrie"
 #    agregada) - mismo motivo estructural, no está desagregado en fuentes
 #    abiertas. salarios_cnss_sector_2020 con "Industrie" es el mejor proxy
 #    disponible.
-# 3. Justificación empírica explícita de la intensidad factorial de cada
-#    sector (por qué fosfatos = tierra/capital-intensivo, automotor =
-#    capital-intensivo con mano de obra abundante) - kl_benchmark (3.1) e
-#    io_coeficientes (2.1/3.2) dan insumos, pero falta un tratamiento en
-#    código que lo deje explícito en vez de asumido.
-# 4. FPP real de Marruecos con los dos sectores seleccionados - vpmgl_fosfatos
-#    y vpmgl_automotor (2.2) calibran el PMgL de cada sector por separado,
-#    pero no arman todavía el par de curvas de producción posible entre
-#    ambos.
+# 3. Variante "Opción B" de la justificación empírica de intensidades
+#    factoriales (3.1): calcular alpha directamente desde Valor Agregado y
+#    Remuneración de Asalariados de OECD TiVA/ICIO para Marruecos (sectores
+#    B y C29), en vez de vía io_coeficientes del HCP. Más riguroso que la
+#    brecha de valor/trabajador ya calculada, pero requiere descargar esa
+#    base aparte - no implementado.
+# 4. Verificación de unidades de precio_fosfatos/precio_auto en 2.4 (ver
+#    comentario ahí): antes de citar el valor de w* en la presentación,
+#    confirmar que produccion_mt e ingresos_mmad/total_mmad están en bases
+#    compatibles.
+# 5. anio_ref_fpp está fijo en 2023 (2.3/2.4) - si al correr el script
+#    conviene otro año de referencia (por disponibilidad de datos o para
+#    la narrativa), es la única variable que hay que cambiar para
+#    recalcular la FPP y la caja de asignación completas.
