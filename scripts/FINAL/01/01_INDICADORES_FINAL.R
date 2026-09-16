@@ -15,7 +15,8 @@ library(scales)
 setwd("/cloud/project")
 
 ruta_datos <- "bases de datos/"
-ruta_graficos <- "graficos/01/"
+ruta_graficos <- "output/graficos/01/"
+ruta_tablas <- "output/tablas/01/"
 
 #===============================================================================#
 # BLOQUE 0: ESTILO GLOBAL
@@ -616,5 +617,45 @@ for (s in names(umbrales_iic)) {
   print(p)
   ggsave(paste0(ruta_graficos, "bubble_", s, ".png"), plot = p,
          width = 10, height = 6.5, dpi = 300, bg = "white")
+}
+
+
+#===============================================================================#
+# BLOQUE 7: EXPORTACIÓN DE TABLAS FINALES
+#===============================================================================#
+# Se guardan solo las tablas que constituyen resultados finales del TP1
+# (las que responden directamente a la consigna). Quedan afuera las tablas
+# puramente auxiliares/intermedias que sólo existen para armar un gráfico
+# (lookup_2dig, detalle_composicion, detalle_apilado, etiquetas_top,
+# totales_division, vcr_aux_mar, variacion_vcrn, iic_heatmap*, etc.).
+
+if (!dir.exists(ruta_tablas)) dir.create(ruta_tablas, recursive = TRUE)
+
+tablas_finales <- list(
+  # --- Bloque 2: perfil de comercio exterior ---
+  "top_socios"          = top_socios,          # ranking de socios comerciales por exportación
+  "destino_fertilizantes" = destino_fertilizantes, # destino de los fertilizantes (272 y 562)
+  "sectores_2dig_exp"    = sectores_2dig_exp,   # principales divisiones exportadoras (2 dígitos)
+  "sectores_2dig_imp"    = sectores_2dig_imp,   # principales divisiones importadoras (2 dígitos)
+  "top_bienes_exp"       = top_bienes_exp,      # principales bienes exportados (3 dígitos)
+  "top_bienes_imp"       = top_bienes_imp,      # principales bienes importados (3 dígitos)
+  "comercio_total"       = comercio_total,      # evolución de expo/impo totales
+  "saldo_comercial"      = saldo_comercial,     # saldo comercial por año
+  "tabla_paises_exp"     = tabla_paises_exp,    # principales países destino, por bien exportado
+  "tabla_paises_imp"     = tabla_paises_imp,    # principales países origen, por bien importado
+  "ranking_paises_imp"   = ranking_paises_imp,  # ranking de países por importaciones totales
+
+  # --- Bloque 3: VCR (Balassa) ---
+  "top_ventaja"          = top_ventaja,         # mayores ventajas comparativas reveladas (VCRN), 2024
+  "top_desventaja"       = top_desventaja,      # mayores desventajas comparativas reveladas (VCRN), 2024
+  "top_volumen"          = top_volumen,         # bienes de mayor volumen exportado, 2024
+
+  # --- Bloque 5: ICC (Michaely) ---
+  "ranking_icc"          = ranking_icc,         # ranking de socios candidatos por ICC (criterio de selección)
+  "icc_evolucion"        = icc_evolucion        # evolución del ICC por socio final, 2021-2025
+)
+
+for (nombre in names(tablas_finales)) {
+  write_csv(tablas_finales[[nombre]], paste0(ruta_tablas, nombre, ".csv"))
 }
 
