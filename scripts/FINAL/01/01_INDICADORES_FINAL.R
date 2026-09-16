@@ -13,6 +13,8 @@ library(RColorBrewer)
 library(scales)
 
 setwd("/cloud/project")
+getwd()
+
 
 ruta_datos <- "bases de datos/"
 ruta_graficos <- "output/graficos/01/"
