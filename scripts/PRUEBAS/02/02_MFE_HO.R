@@ -307,6 +307,53 @@ g_fpp <- ggplot() +
 g_fpp
 ggsave(paste0(ruta_graficos, "grafico_fpp_real.png"), g_fpp, width = 10, height = 7, dpi = 300, bg = "white")
 
+# La curva de arriba está calibrada en un solo año (anio_ref_fpp) y por eso
+# los puntos de otros años quedan "adentro" - muestra el desplazamiento de
+# forma indirecta. Para mostrarlo explícitamente se recalibra una curva
+# distinta para cada año con datos completos: cada curva usa el L_total y
+# la producción observada DE ESE AÑO para fijar A_fosfatos/A_auto, así que
+# el punto de cada año cae exactamente sobre su propia curva - lo que se ve
+# es la FPP entera corriéndose hacia afuera año a año, no un punto que se
+# aleja de una curva fija.
+anios_fpp_familia <- intersect(
+  intersect(ocp_empleo_serie$year, auto_empleo_serie$year[auto_empleo_serie$nota == "declarado/observado"]),
+  intersect(fosfatos_produccion$year, auto_produccion$year)
+)  # excluye 2025 (empleo automotor proyectado, no observado) y 2020 (sin
+   # producción automotriz reportada por OICA)
+
+fpp_familia <- map_dfr(anios_fpp_familia, function(anio) {
+  L_f_anio <- ocp_empleo_serie$empleo[ocp_empleo_serie$year == anio]
+  L_a_anio <- auto_empleo_serie$empleo[auto_empleo_serie$year == anio]
+  L_tot_anio <- L_f_anio + L_a_anio
+  Q_f_anio <- fosfatos_produccion$produccion_mt[fosfatos_produccion$year == anio]
+  Q_a_anio <- auto_produccion$unidades[auto_produccion$year == anio]
+  A_f_anio <- Q_f_anio / (L_f_anio ^ (1 - alpha_fosfatos))
+  A_a_anio <- Q_a_anio / (L_a_anio ^ (1 - alpha_auto))
+
+  tibble(year = anio, L_fosfatos = seq(1000, L_tot_anio - 1000, length.out = 200)) |>
+    mutate(
+      L_auto     = L_tot_anio - L_fosfatos,
+      Q_fosfatos = A_f_anio * L_fosfatos ^ (1 - alpha_fosfatos),
+      Q_auto     = A_a_anio * L_auto     ^ (1 - alpha_auto)
+    )
+})
+
+g_fpp_desplazamiento <- ggplot() +
+  geom_path(data = fpp_familia, aes(x = Q_fosfatos, y = Q_auto, color = factor(year), group = year),
+            linewidth = 1) +
+  geom_point(data = fpp_observado |> filter(year %in% anios_fpp_familia),
+             aes(x = Q_fosfatos, y = Q_auto, color = factor(year)), size = 2.5) +
+  labs(title = "Desplazamiento de la FPP de Marruecos, año a año",
+       subtitle = "Una curva calibrada por año (no una sola curva fija) - cada punto observado cae sobre su propia curva",
+       x = "Producción de fosfatos (miles de toneladas)",
+       y = "Producción automotriz (unidades)",
+       color = "Año",
+       caption = "Cada curva recalibra A_fosfatos/A_auto con el empleo y la producción observados ESE año, manteniendo fijo el alpha de io_coeficientes. El corrimiento hacia afuera es la contracara de la acumulación de capital vía IED (3.4).") +
+  theme_tp1()
+g_fpp_desplazamiento
+ggsave(paste0(ruta_graficos, "grafico_fpp_desplazamiento.png"), g_fpp_desplazamiento,
+       width = 10, height = 7, dpi = 300, bg = "white")
+
 ## --- 2.4 Caja de asignación del trabajo y salario de equilibrio (VPMgL) ---
 # Convierte el PMgL físico de 2.3 a valor monetario multiplicando por el
 # precio implícito de cada sector (ingreso/exportación total del año de
