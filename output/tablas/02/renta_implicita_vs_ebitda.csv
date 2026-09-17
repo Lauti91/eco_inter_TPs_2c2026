@@ -1,0 +1,5 @@
+supuesto,w_mad_mes,renta_no_pagada_mmad,ebitda_ref_mmad,dividendos_ref_mmad,renta_sobre_ebitda,cabe_en_ebitda
+Cota superior (D1 de B08 / empleo OCP),31800.382309819423,5153.55293683687,29396,7251,0.17531476856840625,TRUE
+CNSS Industrie (opción externa),5002,10620.422928040032,29396,7251,0.36128802993740755,TRUE
+CNSS Industrie x 2 (prima minera moderada),10004,9600.014928040031,29396,7251,0.3265755520492595,TRUE
+CNSS Industrie x 3 (prima minera alta),15006,8579.606928040032,29396,7251,0.2918630741611114,TRUE

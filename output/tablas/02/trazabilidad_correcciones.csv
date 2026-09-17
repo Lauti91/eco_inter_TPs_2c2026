@@ -1,0 +1,4 @@
+version,parametro_fosfatos,parametro_automotor,problema_detectado
+v0 - HCP,"0,80 (TRE Base 2014)","0,55 (TRE Base 2014)","Ninguno conocido en su momento; foto fija, sin serie temporal"
+v1 - OCDE B08/C29,"0,539 (2021)","0,568 (2021)","Perímetros mal especificados: OCP no cabe en B08 (VA 2,9x el sector); exportaciones auto > producción C29"
+v2 - OCDE mezclado,"B08+C20 (~0,755 en 2021)",C29+C27 (ver alpha_auto_mezclado),Vigente. Perímetros consistentes con los chequeos de F.2 y C.2
