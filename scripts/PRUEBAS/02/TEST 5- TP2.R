@@ -33,6 +33,16 @@
 # Variable no haya cambiado entre lo que Spark generó y lo que quedó en
 # el archivo final).
 
+# Ya usadas en el TP1 (01_INDICADORES_FINAL.R) - si ese script corrió bien,
+# ya deberían estar instaladas.
+install.packages(c("tidyverse", "haven", "ggrepel", "RColorBrewer", "scales"))
+
+# Nuevas para el TP2 (02_MFE_HO.R / TP2_MFE_HO_Marruecos.Rmd)
+install.packages(c("WDI", "pwt10", "readxl"))
+
+# Solo si usás el .Rmd (detección automática de la raíz del repo al knittear)
+install.packages("rprojroot")
+
 objetos_tp1 <- "output/tablas/01/objetos_heredados_tp1.RData"
 if (file.exists(objetos_tp1)) {
   load(objetos_tp1)
