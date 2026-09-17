@@ -670,5 +670,5 @@ for (nombre in names(tablas_finales)) {
 # siguientes permite que carguen esto en menos de un segundo con load() en
 # vez de correr todo el script - ver el header de scripts/PRUEBAS/02/02_MFE_HO.R.
 
-save(vcr_mar, iic_heatmap_completo, mar_exp, theme_tp1,
+save(vcr_mar, iic_heatmap_completo, mar_exp, theme_tp1, nombres_socio,
      file = paste0(ruta_tablas, "objetos_heredados_tp1.RData"))
