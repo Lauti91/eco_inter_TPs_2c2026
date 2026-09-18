@@ -1,0 +1,8 @@
+variable,valor,valor_min,valor_max,unidad,anio,fuente
+Ratio Consumo Intermedio / Producción (CI/P) - Automotor (C29) OCDE,76.8,NA,NA,% de la Producción bruta,2021,OECD - SUT_USEVA Database (Marruecos MAR)
+Ratio Consumo Intermedio / Producción (CI/P) - Automotor / IMME (C00),75,NA,NA,% de la Producción bruta,2014,HCP - Comptes Nationaux Base 2014 (TRE Tableau 8.1)
+Ratio Consumo Intermedio / Producción (CI/P) - Automotor / IMME (C00),NA,72.5,76.2,% de la Producción bruta,2019,HCP - Comptes Nationaux Base 2014 (Série 2014-2019)
+Ratio Consumo Intermedio / Producción (CI/P) - Minería (B00),43.52,NA,NA,% de la Producción bruta,2014,HCP - Comptes Nationaux Base 2014 (TRE Tableau 8.1)
+Ratio Consumo Intermedio / Producción (CI/P) - Minería (B00),NA,40.5,43.5,% de la Producción bruta,2019,HCP - Comptes Nationaux Base 2014 (Série 2014-2019)
+Ratio Consumo Intermedio / Producción (CI/P) - Minería (B08) OCDE,43.1,NA,NA,% de la Producción bruta,2021,OECD - SUT_USEVA Database (Marruecos MAR)
+Ratio Consumo Intermedio / Producción (CI/P) - Total Manufacturas (C00),70,NA,NA,% de la Producción bruta,2014,HCP - Comptes Nationaux Base 2014 (TRE Tableau 8.1)
