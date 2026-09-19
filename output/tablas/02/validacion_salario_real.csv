@@ -1,5 +1,6 @@
-concepto,mad_mes,veces_vs_cnss_industrie
-"VPMgL predicha (Escenario A, sobre VA)",42953.88235294118,8.587341533974646
-Salario real efectivo de OCP,56460.75,11.28763494602159
-Salario industrial CNSS (Industrie),5002,1
-"SMIG (salario mínimo legal, referencia)",3120,0.62375049980008
+concepto,mad_mes,veces_vs_cnss_industrie,w_sobre_vpmgl
+"VPMgL predicha (Escenario A, HCP)",53692.352941176454,10.734176917468304,1.0515603602221812
+"VPMgL predicha (Escenario B, OCDE)",52271.86092811939,10.450192108780367,1.0801365973490187
+Salario real efectivo de OCP,56460.75,11.28763494602159,1
+Salario industrial CNSS (Industrie),5002,1,11.28763494602159
+"SMIG (salario mínimo legal, referencia)",3120,0.62375049980008,18.09639423076923

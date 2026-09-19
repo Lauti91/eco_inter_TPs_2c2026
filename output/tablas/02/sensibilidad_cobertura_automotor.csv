@@ -1,0 +1,3 @@
+supuesto,factor_escala,brecha_escenario_A,brecha_escenario_B
+Base: valor del producto automotor = exportaciones,1,8.60364228244312,12.401027086313126
+Corregido: exportaciones escaladas a producción (cobertura media observada),1.1788088888038413,7.298589588320285,10.519964011211922

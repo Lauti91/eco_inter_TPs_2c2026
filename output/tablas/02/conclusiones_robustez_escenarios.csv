@@ -1,3 +1,4 @@
-pregunta,escenario_A,escenario_B
-Equilibrio muy por encima del empleo observado (>2x)?,TRUE,TRUE
-Equilibrio por encima del techo técnico Leontief?,TRUE,TRUE
+pregunta,escenario_A,escenario_B,magnitud_A,magnitud_B,dispersion_B_sobre_A
+Equilibrio muy por encima del empleo observado (>2x)?,TRUE,TRUE,8.479504458111409,10.534208280610894,1.2423141390690557
+Equilibrio por encima del techo técnico Leontief?,TRUE,TRUE,7.344452680253976,9.124117408403137,1.2423141390690557
+Brecha de VPMgL en el punto observado (veces),NA,NA,8.60364228244312,12.401027086313126,1.4413694432204691
