@@ -34,25 +34,43 @@ Entregas principales de la cursada:
 
 ```
 eco_inter_TPs_2c2026/
-├── bases de datos/     # Bases .dta descargadas de WITS (Comtrade), compartidas entre TPs
-├── graficos/
-│   └── 01/              # Gráficos del TP1
-│   └── 02/              # (a agregar cuando corresponda)
+├── bases de datos/      # Bases .dta descargadas de WITS (Comtrade) y fuentes .xlsx, compartidas entre TPs
+├── docs/                # Consignas de la cátedra (TP 1.pdf, TP 2.pdf)
+├── prompts/              # Prompts de investigación enviados a Gemini Spark (rondas 1-4, TP2)
+├── output/
+│   ├── graficos/
+│   │   ├── 01/           # Gráficos del TP1
+│   │   ├── 02/           # Gráficos del TP2
+│   │   └── 03/, 04/      # (a completar cuando corresponda)
+│   └── tablas/
+│       ├── 01/           # Tablas finales del TP1 (CSV) + objetos_heredados_tp1.RData
+│       ├── 02/           # Tablas finales del TP2 (CSV)
+│       └── 03/, 04/      # (a completar cuando corresponda)
 ├── scripts/
-│   └── 01_indicadores_clean.R   # Scripts del TP1
+│   ├── FINAL/
+│   │   ├── 01/            # 01_INDICADORES_FINAL.R + informe TP1 (.Rmd/.md)
+│   │   └── 02/            # SCRIPT 1/2/3 del TP2 (datos y modelo base / OCDE y robustez / gráficos), en ese orden
+│   └── PRUEBAS/
+│       ├── 01/            # Borradores del TP1
+│       └── 02/            # Borradores, auditorías y renders del TP2
 ├── .gitignore
 ├── project.Rproj
 └── README.md
 ```
 
-A medida que avance la cursada, cada entrega suma su propia subcarpeta
-numerada dentro de `graficos/` y su propio script en `scripts/`, siguiendo
-la misma convención de numeración.
+Convención: `FINAL/<entrega>` tiene el/los script(s) validados de esa entrega;
+`PRUEBAS/<entrega>` guarda borradores y material de auditoría, no el
+entregable. Cada entrega numerada (01, 02, 03, 04) corresponde a una de las
+cuatro presentaciones/entregas grandes de la cursada (ver cronograma arriba).
 
-## Paquetes necesarios (comunes a todos los TPs)
+## Paquetes necesarios
 
 ```r
-install.packages(c("tidyverse", "haven", "ggrepel", "scales"))
+# Comunes a todos los TPs
+install.packages(c("tidyverse", "haven", "ggrepel", "scales", "RColorBrewer"))
+
+# Específicos del TP2 (Script 1 de scripts/FINAL/02/ los instala solo si faltan)
+install.packages(c("WDI", "pwt10", "readxl", "broom", "readr", "showtext"))
 ```
 
 ---
@@ -111,9 +129,12 @@ Se calculan y analizan tres indicadores:
 ### Cómo correrlo
 
 1. Descargar las bases desde WITS siguiendo los filtros de la sección
-   [Datos](#datos-1) y guardarlas en `bases de datos/`.
-2. Correr `scripts/01_indicadores_clean.R`, que lee y limpia las bases,
-   calcula VCR/VCRN, ICC e IIC, y guarda los gráficos en `graficos/01/`.
+   [Datos](#datos) y guardarlas en `bases de datos/`.
+2. Correr `scripts/FINAL/01/01_INDICADORES_FINAL.R`, que lee y limpia las
+   bases, calcula VCR/VCRN, ICC e IIC, guarda los gráficos en
+   `output/graficos/01/`, las tablas finales en `output/tablas/01/`, y deja
+   guardado un `.RData` con los objetos livianos que heredan los TPs
+   siguientes (evita tener que re-correr todo el TP1 desde cero).
 
 ### Conclusiones principales
 
@@ -127,3 +148,75 @@ Se calculan y analizan tres indicadores:
   exportado (ej. automotriz, por integración industrial con la UE) y
   sectores que explican **especialización genuina** (ej. fertilizantes,
   pesca, corcho).
+
+---
+
+## TP2 — Modelo de Factores Específicos y Heckscher-Ohlin
+
+**Presentación oral:** 22/09/2026
+
+### Objetivo
+
+Aplicar los dos modelos que integra la consigna —Factores Específicos (MFE,
+corto plazo) y Heckscher-Ohlin (HO, largo plazo)— a los dos sectores
+exportadores de Marruecos identificados en el TP1: **fosfatos** (fertilizantes
+crudos y manufacturados, CUCI 272/562) y **automotor** (autos de pasajeros y
+autopartes, CUCI 781/784), y comparar qué predice cada modelo sobre el
+patrón exportador y los efectos distributivos de corto vs. largo plazo.
+
+### Datos
+
+Además de las bases de WITS heredadas del TP1, el TP2 suma:
+
+- **World Bank WDI** — términos de intercambio (`TT.PRI.MRCH.XD.WD`)
+- **Penn World Table 10.01** (paquete `pwt10`) — dotación K/L, capital
+  humano y participación del trabajo en el ingreso (cobertura hasta 2019 en
+  la versión pública del paquete)
+- **OCDE, dataset `SUT_USEVA`** — Valor Agregado y Remuneración de
+  Asalariados por actividad para Marruecos (sectores B08 y C29, 2014-2021);
+  fuente de un alpha alternativo al de HCP para las intensidades factoriales
+- **Datos duros investigados con Gemini Spark** (informes de OCP, USGS,
+  OICA, Office des Changes, HCP, CNSS, UNCTADstat) — ver `prompts/` para los
+  prompts de cada ronda de investigación y
+  `scripts/PRUEBAS/02/TP2_seguimiento_verificacion_metodologica.md` para el
+  detalle de qué se auditó, qué bugs se encontraron y cómo se corrigieron
+
+### Análisis realizado
+
+Los tres scripts de `scripts/FINAL/02/` se corren en orden (cada uno depende
+del anterior):
+
+1. **`SCRIPT 1 - DATOS Y MODELO BASE.R`** — hereda objetos del TP1 (via
+   `.RData` si existe, si no corre el TP1 completo), carga los datos duros
+   del TP2 desde el Excel de fuentes, y arma el modelo base del MFE/HO con
+   alpha de HCP (Escenario A): FPP calibrada con Cobb-Douglas, desplazamiento
+   de la FPP año a año, caja de asignación del trabajo (VPMgL), y comparación
+   contra el techo técnico de Leontief.
+2. **`SCRIPT 2 - OECD Y ROBUSTEZ.R`** — agrega el alpha alternativo de OCDE
+   (Escenario B), corrige los perímetros de OCP/automotor y la fórmula de
+   VPMgL (participación del trabajo observada en vez de `1-alpha`, valor
+   agregado en vez de producción bruta — ver el documento de verificación
+   metodológica), y contrasta la VPMgL corregida contra salarios reales de
+   CNSS.
+3. **`SCRIPT 3 - GRAFICOS.R`** — concentra los 13 gráficos del TP2
+   (`ggplot` + `ggsave`), usando los objetos que dejan los dos scripts
+   anteriores.
+
+### Cómo correrlo
+
+1. Confirmar que `bases de datos/` tiene el Excel de fuentes del TP2
+   (`TP2_Economia_Internacional_Marruecos_Fuentes_de_Datos.xlsx`).
+2. Correr, en orden, los tres scripts de `scripts/FINAL/02/`. Los gráficos
+   quedan en `output/graficos/02/` y las tablas en `output/tablas/02/`.
+
+### Estado
+
+En elaboración de cara a la presentación del 22/09. El análisis de
+robustez (Escenario A vs. B) ya muestra que la brecha de VPMgL entre
+fosfatos y automotor, y la comparación contra el equilibrio teórico y el
+techo de Leontief, son cualitativamente robustas a la fuente del parámetro
+alpha — se van a presentar como un rango, no como un número único. Falta
+volver a generar el informe final en PDF
+(`scripts/PRUEBAS/02/TP2_MFE_HO_Marruecos (1).Rmd`) incorporando las
+correcciones más recientes, que por ahora solo están en el render
+intermedio `(4)`.
