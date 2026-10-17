@@ -1,0 +1,15 @@
+indicador,valor,detalle
+Líneas HS 8708 con arancel NMF 2023,52,
+NMF promedio simple (%),12.163461538461538,
+NMF máximo (%),40,
+Líneas con arancel > 15% (%),30.76923076923077,
+"Líneas por encima de 3 veces el promedio (picos nacionales, %)",21.153846153846153,"umbral 36,5%"
+"NMF ponderado por importaciones, central (%)",13.026332988049793,"rango 2,9-32,2"
+Consolidado 8708 (lista 2002): mínimo-máximo (%),NA,30-45
+Importaciones HS 8708 (M USD),2398.400723,sin origen no especificado
+Importaciones que pagan NMF (% de HS 8708),9.997566907838193,
+"Recaudación potencial con preferencias, central (M USD)",26.77798113754762,
+"Recaudación potencial con preferencias, rango (M USD)",NA,"8,0-86,8"
+"Recaudación potencial sin preferencias, central (M USD)",312.4236645657738,
+"Pérdida de eficiencia b + d calibrada, con preferencias (M USD)",1.4862741448245105,"rango 0,2-15,0; wiiw"
+"Pérdida de eficiencia b + d calibrada, sin preferencias (M USD)",16.64380728823568,"rango 1,1-137,6; wiiw"

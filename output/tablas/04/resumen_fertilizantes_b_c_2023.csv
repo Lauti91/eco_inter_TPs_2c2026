@@ -1,0 +1,17 @@
+indicador,valor,detalle
+Tasa del depósito del CVD al inicio del año base (%),19.97,
+Tasa del depósito del CVD al fin del año base (%),2.12,
+"Tasa promedio del año base, ponderada por días (%)",17.28027397260274,mínimo 2.12 - máximo 19.97
+Arancel NMF de EE.UU. a DAP y MAP (%),0,
+"Participación de Marruecos en importaciones de EE.UU. de DAP y MAP, valor, año previo (%)",57.50536317156129,año 2019
+"Participación de Marruecos en importaciones de EE.UU. de DAP y MAP, valor, año base (%)",8.08440984208464,
+"Importaciones de EE.UU. desde Marruecos de DAP y MAP, año base (M USD)",110.114925,
+"Derecho pagado c + e = t x M en DAP y MAP, año base, central (M USD)",19.028160724726025,
+"Derecho pagado c + e = t x M en DAP y MAP, año base, rango (M USD)",NA,2.3-22.0
+"Derecho pagado c + e = t x M en el alcance de la orden, año base, central (M USD)",29.77679319487397,rango 3.7-34.4
+"Precio unitario MAP Marruecos / otros orígenes, año previo",0.8646137806897899,año 2019
+"Precio unitario MAP Marruecos / otros orígenes, año base",1.046797599332637,
+"Exportaciones de DAP y MAP de Marruecos, año base (M USD)",3803.609683,reporta Marruecos
+"Participación de EE.UU. en esas exportaciones, año base (%)",5.602523806594274,reporta Marruecos
+"Participación de Marruecos en exportaciones mundiales de DAP, año base (%)",25.06810370787961,
+"Participación de Marruecos en exportaciones mundiales de MAP, año base (%)",32.28044644231023,

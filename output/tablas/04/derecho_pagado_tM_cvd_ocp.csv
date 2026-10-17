@@ -1,0 +1,13 @@
+anio,alcance,base_M,n_dias,n_dias_sin_tasa,tasa_prom,tasa_min,tasa_max,derecho_central_M,derecho_min_M,derecho_max_M,liquidacion
+2019,Alcance de la orden (HS6 principales),751.0261330000001,365,0,0,0,0,0,0,0,depósito; la liquidación definitiva depende de las revisiones
+2020,Alcance de la orden (HS6 principales),286.568295,366,32,NA,0,0,NA,NA,NA,sin tasa conocida para todo el año
+2021,Alcance de la orden (HS6 principales),147.265982,365,88,NA,0,19.97,NA,NA,NA,sin tasa conocida para todo el año
+2022,Alcance de la orden (HS6 principales),156.53475,365,0,19.97,19.97,19.97,31.259989575,31.259989575,31.259989575,depósito; la liquidación definitiva depende de las revisiones
+2023,Alcance de la orden (HS6 principales),172.316673,365,0,17.28027397260274,2.12,19.97,29.77679319487397,3.6531134676000003,34.4116395981,"definitiva = tasa del depósito (revisión rescindida, cvd06)"
+2024,Alcance de la orden (HS6 principales),195.003595,366,0,4.123387978142077,2.12,16.81,8.040754793174864,4.134076214,32.7801043195,depósito; la liquidación definitiva depende de las revisiones
+2019,DAP y MAP,676.381042,365,0,0,0,0,0,0,0,depósito; la liquidación definitiva depende de las revisiones
+2020,DAP y MAP,247.46996299999998,366,32,NA,0,0,NA,NA,NA,sin tasa conocida para todo el año
+2021,DAP y MAP,97.95944,365,88,NA,0,19.97,NA,NA,NA,sin tasa conocida para todo el año
+2022,DAP y MAP,123.761766,365,0,19.97,19.97,19.97,24.715224670199994,24.715224670199994,24.715224670199994,depósito; la liquidación definitiva depende de las revisiones
+2023,DAP y MAP,110.114925,365,0,17.28027397260274,2.12,19.97,19.028160724726025,2.3344364100000004,21.9899505225,"definitiva = tasa del depósito (revisión rescindida, cvd06)"
+2024,DAP y MAP,145.762234,366,0,4.123387978142077,2.12,16.81,6.010342433427323,3.0901593608,24.5026315354,depósito; la liquidación definitiva depende de las revisiones
