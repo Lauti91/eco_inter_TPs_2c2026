@@ -18,8 +18,8 @@ Arancel NMF de EE.UU. a DAP y MAP (%),0,
 "Importaciones de EE.UU. / exportaciones mundiales de DAP y MAP, año base (%)",10.019030152116414,grande
 "Participación de EE.UU. en las exportaciones de DAP y MAP de Marruecos, año previo (%)",27.08527368525768,año 2019; reporta Marruecos
 "Parte del derecho absorbida por el exportador, implícita en precios (%)",-119.95752761991679,sin evidencia de absorción (e ~ 0)
-"Pérdida de eficiencia calibrada b + d, USITC (M USD)",NA,"7,4-12,5 (elasticidad 4-6)"
-"Bienestar neto de EE.UU. calibrado, USITC (M USD)",NA,"-12,5 a -7,4"
+Pérdida de eficiencia calibrada b + d (M USD),NA,"3,5-12,5 (elasticidad 2,09-6); USITC 4-6: 7,4-12,5"
+Bienestar neto de EE.UU. calibrado (M USD),NA,"-12,5 a -3,5; USITC 4-6: -12,5 a -7,4"
 Producción de EE.UU. / consumo aparente de DAP y MAP (%),95.6474428726877,año 2022; USDA ERS (IFA)
 Participación aproximada de Marruecos en el consumo de EE.UU. (%),2.5517283384461162,año 2022; aproximación valor x nutriente
 "Área a si el precio interno de EE.UU. sube 1% (M USD, orden de magnitud)",46.39011239933333,"año 2022; c + e del mismo año = 24,7 M USD"

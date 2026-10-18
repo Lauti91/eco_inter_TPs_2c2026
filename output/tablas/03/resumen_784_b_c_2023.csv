@@ -1,15 +1,15 @@
 indicador,valor,detalle
 Líneas HS 8708 con arancel NMF 2023,52,
-NMF promedio simple (%),12.163461538461538,
+NMF promedio simple (%),14.471153846153847,
 NMF máximo (%),40,
-Líneas con arancel > 15% (%),30.76923076923077,
-"Líneas por encima de 3 veces el promedio (picos nacionales, %)",21.153846153846153,"umbral 36,5%"
-"NMF ponderado por importaciones, central (%)",13.026332988049793,"rango 2,9-32,2"
+Líneas con arancel > 15% (%),38.46153846153847,
+"Líneas por encima de 3 veces el promedio (picos nacionales, %)",0,"umbral 43,4%"
+"NMF ponderado por importaciones, central (%)",14.204461134566726,"rango 2,9-33,2"
 Consolidado 8708 (lista 2002): mínimo-máximo (%),NA,30-45
 Importaciones HS 8708 (M USD),2398.400723,sin origen no especificado
 Importaciones que pagan NMF (% de HS 8708),9.997566907838193,
-"Recaudación potencial con preferencias, central (M USD)",26.77798113754762,
-"Recaudación potencial con preferencias, rango (M USD)",NA,"8,0-86,8"
-"Recaudación potencial sin preferencias, central (M USD)",312.4236645657738,
-"Pérdida de eficiencia b + d calibrada, con preferencias (M USD)",1.4862741448245105,"rango 0,2-15,0; wiiw"
-"Pérdida de eficiencia b + d calibrada, sin preferencias (M USD)",16.64380728823568,"rango 1,1-137,6; wiiw"
+"Recaudación potencial con preferencias, central (M USD)",38.416616759869044,
+"Recaudación potencial con preferencias, rango (M USD)",NA,"8,0-96,5"
+"Recaudación potencial sin preferencias, central (M USD)",340.6798985497024,
+"Pérdida de eficiencia b + d calibrada, con preferencias (M USD)",2.7457301754874015,"rango 0,2-17,2; wiiw"
+"Pérdida de eficiencia b + d calibrada, sin preferencias (M USD)",19.658899681781584,"rango 1,1-143,0; wiiw"
