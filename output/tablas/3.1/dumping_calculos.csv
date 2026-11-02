@@ -1,0 +1,3 @@
+mercado,Q0,P0,a,IT0,IT1,IMg_discreto,IMg_continuo,elasticidad,IMg_P_1_menos_1_sobre_e,panel
+Mercado local,800,18,26,14400,14409.990000000002,9.9900000000016,10,2.25,10,"Mercado local (|e| = 2,25)"
+Mercado externo,100,12,13,1200,1210.99,10.990000000000009,11,12,11,"Mercado externo (|e| = 12,00)"

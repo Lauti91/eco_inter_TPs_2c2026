@@ -1,0 +1,193 @@
+PartnerISO3,ProductCode,Export,Import,comercio,GL_i,tipo,ProductDescription
+BRA,01,1471.148,27943.049,29414.197,0.10002979173628301,predom. interindustrial,Animals; live
+BRA,02,90092.512,66108.298,156200.81,0.8464526912504486,predom. intraindustrial,Meat and edible meat offal
+BRA,03,86720.387,234.479,86954.86600000001,0.005393119690392134,predom. interindustrial,"Fish and crustaceans, molluscs and"
+BRA,04,628041.425,3935.599,631977.0240000001,0.012454880005258073,predom. interindustrial,Dairy produce; birds' eggs; natural
+BRA,05,1314.334,2286.562,3600.8959999999997,0.7300038657045358,predom. intraindustrial,Animal originated products; not els
+BRA,06,0,24.001,24.001,0,predom. interindustrial,"Trees and other plants, live; bulbs"
+BRA,07,199327.369,45725.52,245052.889,0.37318898941852496,predom. interindustrial,Vegetables and certain roots and tu
+BRA,08,227991.588,48870.004,276861.592,0.3530284113948172,predom. interindustrial,"Fruit and nuts, edible; peel of cit"
+BRA,09,4256.1,138681.434,142937.534,0.059551887889712773,predom. interindustrial,"Coffee, tea, mate and spices"
+BRA,10,1461213.179,21835.797,1483048.976,0.02944716911358436,predom. interindustrial,Cereals
+BRA,11,447666.931,1374.803,449041.734,0.006123274947089974,predom. interindustrial,Products of the milling industry; m
+BRA,12,29403.063,105471.769,134874.832,0.4360051844216569,predom. interindustrial,Oil seeds and oleaginous fruits; mi
+BRA,13,1641.747,2275.558,3917.3050000000003,0.8382022844787425,predom. intraindustrial,"Lac; gums, resins and other vegetab"
+BRA,14,0,230.811,230.811,0,predom. interindustrial,Vegetable plaiting materials; veget
+BRA,15,110226.293,16183.565,126409.85800000001,0.25604909705697165,predom. interindustrial,"Animal, vegetable or microbial fats"
+BRA,16,303.358,18608.652,18912.01,0.03208098980489116,predom. interindustrial,"Meat, fish, crustaceans, molluscs o"
+BRA,17,8104.045,14171.614,22275.659,0.7276143884228072,predom. intraindustrial,Sugars and sugar confectionery
+BRA,18,57699.085,252186.92,309886.005,0.3723890983718351,predom. interindustrial,Cocoa and cocoa preparations
+BRA,19,53913.559,23248.845,77162.40400000001,0.6025951446510143,predom. intraindustrial,"Preparations of cereals, flour, sta"
+BRA,20,345209.065,9695.007,354904.072,0.05463452107137268,predom. interindustrial,"Preparations of vegetables, fruit,"
+BRA,21,37931.66,78731.464,116663.12400000001,0.6502767746901754,predom. intraindustrial,Miscellaneous edible preparations
+BRA,22,134368.854,3161.338,137530.19199999998,0.04597300351329381,predom. interindustrial,"Beverages, spirits and vinegar"
+BRA,23,14899.642,26199.15,41098.792,0.7250647172306184,predom. intraindustrial,"Food industries, residues and waste"
+BRA,24,21174.53,51222.54,72397.07,0.5849554408762675,predom. intraindustrial,Tobacco and manufactured tobacco su
+BRA,25,40515.227,18020.445,58535.672,0.6157081445994163,predom. intraindustrial,"Salt; sulphur; earths, stone; plast"
+BRA,26,0,572888.038,572888.038,0,predom. interindustrial,"Ores, slag and ash"
+BRA,27,1025607.561,286364.276,1311971.837,0.43654027917978866,predom. interindustrial,"Mineral fuels, mineral oils and pro"
+BRA,28,68119.139,222341.627,290460.766,0.4690419290569522,predom. interindustrial,Inorganic chemicals; organic and in
+BRA,29,110939.125,178443.467,289382.592,0.7667297761988392,predom. intraindustrial,Organic chemicals
+BRA,30,92762.733,73870.823,166633.55599999998,0.886626016670976,predom. intraindustrial,Pharmaceutical products
+BRA,31,188.238,36409.821,36598.059,0.010286775044545227,predom. interindustrial,Fertilizers
+BRA,32,11942.41,156946.799,168889.209,0.14142300826336396,predom. interindustrial,Tanning or dyeing extracts; tannins
+BRA,33,63638.139,118894.752,182532.891,0.6972785962174894,predom. intraindustrial,Essential oils and resinoids; perfu
+BRA,34,16630.437,171962.082,188592.519,0.17636369765017035,predom. interindustrial,"Soap, organic surface-active agents"
+BRA,35,57280.154,80358.434,137638.588,0.8323269634239492,predom. intraindustrial,Albuminoidal substances; modified s
+BRA,36,0,1266.673,1266.673,0,predom. interindustrial,Explosives; pyrotechnic products; m
+BRA,37,0,4021.408,4021.408,0,predom. interindustrial,Photographic or cinematographic goo
+BRA,38,210260.523,330110.876,540371.399,0.7782074454314337,predom. intraindustrial,Chemical products n.e.c.
+BRA,39,485664.484,769746.174,1255410.658,0.773714132352061,predom. intraindustrial,Plastics and articles thereof
+BRA,40,142138.099,410997.185,553135.284,0.513936113321601,predom. intraindustrial,Rubber and articles thereof
+BRA,41,6212.183,6706.925,12919.108,0.9617046316200778,predom. intraindustrial,Raw hides and skins (other than fur
+BRA,42,203.329,555.38,758.7090000000001,0.5359867880834418,predom. intraindustrial,Articles of leather; saddlery and h
+BRA,43,0,207.33,207.33,0,predom. interindustrial,Furskins and artificial fur; manufa
+BRA,44,9708.133,22503.932,32212.065000000002,0.6027637781061226,predom. intraindustrial,Wood and articles of wood; wood cha
+BRA,45,105.453,127.209,232.662,0.9064909611367563,predom. intraindustrial,Cork and articles of cork
+BRA,46,0,0.267,0.267,0,predom. interindustrial,"Manufactures of straw, esparto or o"
+BRA,47,0,67487.992,67487.992,0,predom. interindustrial,Pulp of wood or other fibrous cellu
+BRA,48,16598.528,427640.083,444238.611,0.07472798441646489,predom. interindustrial,Paper and paperboard; articles of p
+BRA,49,1368.472,2700.249,4068.7209999999995,0.6726792031205875,predom. intraindustrial,"Printed books, newspapers, pictures"
+BRA,50,0,19.217,19.217,0,predom. interindustrial,Silk
+BRA,51,0,208.829,208.829,0,predom. interindustrial,"Wool, fine or coarse animal hair; h"
+BRA,52,17119.187,16974.49,34093.677,0.9957558992536945,predom. intraindustrial,Cotton
+BRA,53,0,1247.144,1247.144,0,predom. interindustrial,Vegetable textile fibres; paper yar
+BRA,54,2837.626,25681.649,28519.275,0.1989970642661849,predom. interindustrial,Man-made filaments; strip and the l
+BRA,55,201.964,25089.2,25291.164,0.015971111491744683,predom. interindustrial,Man-made staple fibres
+BRA,56,24003.135,43169.513,67172.648,0.7146699055246415,predom. intraindustrial,"Wadding, felt and nonwovens, specia"
+BRA,57,97.751,11566.138,11663.889000000001,0.0167613049129669,predom. interindustrial,Carpets and other textile floor cov
+BRA,58,348.115,3738.14,4086.255,0.17038339506467426,predom. interindustrial,"Fabrics; special woven fabrics, tuf"
+BRA,59,843.984,23981.961,24825.945,0.06799209456075084,predom. interindustrial,"Textile fabrics; impregnated, coate"
+BRA,60,0,21259.819,21259.819,0,predom. interindustrial,Fabrics; knitted or crocheted
+BRA,61,4963.444,9912.998,14876.442,0.6672891273330008,predom. intraindustrial,Apparel and clothing accessories; k
+BRA,62,0,2599.7,2599.7,0,predom. interindustrial,Apparel and clothing accessories; n
+BRA,63,142.476,12377.191,12519.667000000001,0.02276034977607644,predom. interindustrial,"Textiles, made up articles; sets; w"
+BRA,64,0,214960.597,214960.597,0,predom. interindustrial,Footwear; gaiters and the like; par
+BRA,65,0,1152.951,1152.951,0,predom. interindustrial,Headgear and parts thereof
+BRA,66,0,96.87,96.87,0,predom. interindustrial,"Umbrellas, sun umbrellas, walking-s"
+BRA,67,0,0,0,NA,NA,"Feathers and down, prepared; and ar"
+BRA,68,8118.131,37053.625,45171.756,0.3594339347799541,predom. interindustrial,"Stone, plaster, cement, asbestos, m"
+BRA,69,49.978,57776.398,57826.376000000004,0.0017285537658456862,predom. interindustrial,Ceramic products
+BRA,70,18302.719,97716.026,116018.745,0.3155131353989392,predom. interindustrial,Glass and glassware
+BRA,71,0,1653.576,1653.576,0,predom. interindustrial,"Natural, cultured pearls; precious,"
+BRA,72,60770.427,617903.105,678673.532,0.17908589074017411,predom. interindustrial,Iron and steel
+BRA,73,49471.314,183995.537,233466.85100000002,0.42379732958320504,predom. interindustrial,Iron or steel articles
+BRA,74,1503.181,115240.923,116744.10399999999,0.025751724472526605,predom. interindustrial,Copper and articles thereof
+BRA,75,0,6930.189,6930.189,0,predom. interindustrial,Nickel and articles thereof
+BRA,76,328364.297,173234.555,501598.852,0.6907294716057284,predom. intraindustrial,Aluminium and articles thereof
+BRA,78,5014.886,1543.572,6558.4580000000005,0.4707118655025312,predom. interindustrial,Lead and articles thereof
+BRA,79,309.853,82485.138,82794.99100000001,0.007484824776416765,predom. interindustrial,Zinc and articles thereof
+BRA,80,0,16844.4,16844.4,0,predom. interindustrial,Tin; articles thereof
+BRA,81,0,412.849,412.849,0,predom. interindustrial,"Metals; n.e.c., cermets and article"
+BRA,82,4452.337,37655.949,42108.286,0.21147082548076168,predom. interindustrial,"Tools, implements, cutlery, spoons"
+BRA,83,6894.177,68348.65,75242.82699999999,0.18325140813754903,predom. interindustrial,Metal; miscellaneous products of ba
+BRA,84,552860.495,1421820.563,1974681.0580000002,0.5599491550903406,predom. intraindustrial,Machinery and mechanical appliances
+BRA,85,41293.678,691096.439,732390.117,0.11276415954149188,predom. interindustrial,Electrical machinery and equipment
+BRA,86,0,909.2,909.2,0,predom. interindustrial,"Railway, tramway locomotives, rolli"
+BRA,87,6000361.09,5114632.456,11114993.546,0.9203122673590081,predom. intraindustrial,Vehicles; other than railway or tra
+BRA,88,0,19.463,19.463,0,predom. interindustrial,"Aircraft, spacecraft, and parts the"
+BRA,89,0,269.08,269.08,0,predom. interindustrial,"Ships, boats and floating structure"
+BRA,90,21588.491,142238.326,163826.817,0.26355259041625656,predom. interindustrial,"Optical, photographic, cinematograp"
+BRA,91,0,286.955,286.955,0,predom. interindustrial,Clocks and watches and parts thereo
+BRA,92,133.188,96.247,229.435,0.8389914354828165,predom. intraindustrial,Musical instruments; parts and acce
+BRA,93,138.332,2282.203,2420.535,0.11429869842823992,predom. interindustrial,Arms and ammunition; parts and acce
+BRA,94,4431.246,101796.368,106227.614,0.08342926727131417,predom. interindustrial,"Furniture; bedding, mattresses, mat"
+BRA,95,0,4817.765,4817.765,0,predom. interindustrial,"Toys, games and sports requisites;"
+BRA,96,786.462,22235.592,23022.054,0.06832248764597626,predom. interindustrial,Miscellaneous manufactured articles
+BRA,97,5.3,203.071,208.371,0.05087080255889742,predom. interindustrial,Works of art; collectors' pieces an
+CHN,01,0,3.62,3.62,0,predom. interindustrial,Animals; live
+CHN,02,1608874.228,0,1608874.228,0,predom. interindustrial,Meat and edible meat offal
+CHN,03,301796.329,0,301796.329,0,predom. interindustrial,"Fish and crustaceans, molluscs and"
+CHN,04,23348.361,27.852,23376.213,0.0023829351657600473,predom. interindustrial,Dairy produce; birds' eggs; natural
+CHN,05,0,189.652,189.652,0,predom. interindustrial,Animal originated products; not els
+CHN,06,0,54.868,54.868,0,predom. interindustrial,"Trees and other plants, live; bulbs"
+CHN,07,2196.656,5603.338,7799.994,0.5632455614709447,predom. intraindustrial,Vegetables and certain roots and tu
+CHN,08,11595.476,504.209,12099.685000000001,0.08334250023864265,predom. interindustrial,"Fruit and nuts, edible; peel of cit"
+CHN,09,412.938,5158.578,5571.5160000000005,0.14823182774670307,predom. interindustrial,"Coffee, tea, mate and spices"
+CHN,10,595543.591,5.931,595549.522,1.9917739099373222e-5,predom. interindustrial,Cereals
+CHN,11,0,515.859,515.859,0,predom. interindustrial,Products of the milling industry; m
+CHN,12,1767227.997,6068.423,1773296.42,0.00684422855824629,predom. interindustrial,Oil seeds and oleaginous fruits; mi
+CHN,13,0,9491.443,9491.443,0,predom. interindustrial,"Lac; gums, resins and other vegetab"
+CHN,14,0,30.699,30.699,0,predom. interindustrial,Vegetable plaiting materials; veget
+CHN,15,481275.145,889.693,482164.83800000005,0.0036904101248462773,predom. interindustrial,"Animal, vegetable or microbial fats"
+CHN,16,0,87.87,87.87,0,predom. interindustrial,"Meat, fish, crustaceans, molluscs o"
+CHN,17,0,1794.406,1794.406,0,predom. interindustrial,Sugars and sugar confectionery
+CHN,18,0,1160.798,1160.798,0,predom. interindustrial,Cocoa and cocoa preparations
+CHN,19,0,2960.147,2960.147,0,predom. interindustrial,"Preparations of cereals, flour, sta"
+CHN,20,5998.747,10378.887,16377.634000000002,0.7325535544389379,predom. intraindustrial,"Preparations of vegetables, fruit,"
+CHN,21,0,10340.517,10340.517,0,predom. interindustrial,Miscellaneous edible preparations
+CHN,22,8916.534,654.714,9571.248,0.13680849143183837,predom. interindustrial,"Beverages, spirits and vinegar"
+CHN,23,37932.681,10854.961,48787.64199999999,0.4449881385946055,predom. interindustrial,"Food industries, residues and waste"
+CHN,24,81209.452,0,81209.452,0,predom. interindustrial,Tobacco and manufactured tobacco su
+CHN,25,111.157,5918.113,6029.27,0.036872457196310715,predom. interindustrial,"Salt; sulphur; earths, stone; plast"
+CHN,26,132725.473,10569.719,143295.192,0.147523707564452,predom. interindustrial,"Ores, slag and ash"
+CHN,27,19821.056,9190.679,29011.735,0.6335835481745576,predom. intraindustrial,"Mineral fuels, mineral oils and pro"
+CHN,28,447470.123,118923.61,566393.733,0.41993264780703354,predom. interindustrial,Inorganic chemicals; organic and in
+CHN,29,6048.449,1261034.608,1267083.057,0.009547044239263336,predom. interindustrial,Organic chemicals
+CHN,30,39803.948,97134.82,136938.768,0.5813393618379858,predom. intraindustrial,Pharmaceutical products
+CHN,31,0,206358.01,206358.01,0,predom. interindustrial,Fertilizers
+CHN,32,8075.651,67359.292,75434.943,0.21410902371862328,predom. interindustrial,Tanning or dyeing extracts; tannins
+CHN,33,1198.731,14021.663,15220.394,0.15751642171680968,predom. interindustrial,Essential oils and resinoids; perfu
+CHN,34,0,40818.447,40818.447,0,predom. interindustrial,"Soap, organic surface-active agents"
+CHN,35,0,15842.18,15842.18,0,predom. interindustrial,Albuminoidal substances; modified s
+CHN,36,0,668.064,668.064,0,predom. interindustrial,Explosives; pyrotechnic products; m
+CHN,37,0,4362.921,4362.921,0,predom. interindustrial,Photographic or cinematographic goo
+CHN,38,7908.306,240958.999,248867.30500000002,0.0635543989999009,predom. interindustrial,Chemical products n.e.c.
+CHN,39,6277.873,529595.638,535873.511,0.023430428528869784,predom. interindustrial,Plastics and articles thereof
+CHN,40,0,231147.304,231147.304,0,predom. interindustrial,Rubber and articles thereof
+CHN,41,109342.833,0.378,109343.211,6.914009503478091e-6,predom. interindustrial,Raw hides and skins (other than fur
+CHN,42,0,118275.801,118275.801,0,predom. interindustrial,Articles of leather; saddlery and h
+CHN,43,0,103.725,103.725,0,predom. interindustrial,Furskins and artificial fur; manufa
+CHN,44,17651.626,16242.422,33894.048,0.9584232606267625,predom. intraindustrial,Wood and articles of wood; wood cha
+CHN,45,0,66.421,66.421,0,predom. interindustrial,Cork and articles of cork
+CHN,46,0,1375.69,1375.69,0,predom. interindustrial,"Manufactures of straw, esparto or o"
+CHN,47,0,30.22,30.22,0,predom. interindustrial,Pulp of wood or other fibrous cellu
+CHN,48,0,78970.628,78970.628,0,predom. interindustrial,Paper and paperboard; articles of p
+CHN,49,0,24692.254,24692.254,0,predom. interindustrial,"Printed books, newspapers, pictures"
+CHN,50,0,180.965,180.965,0,predom. interindustrial,Silk
+CHN,51,25780.418,450.804,26231.222,0.034371559205286006,predom. interindustrial,"Wool, fine or coarse animal hair; h"
+CHN,52,14157.16,12543.206,26700.366,0.9395531132419683,predom. intraindustrial,Cotton
+CHN,53,0,4431.723,4431.723,0,predom. interindustrial,Vegetable textile fibres; paper yar
+CHN,54,0,88208.855,88208.855,0,predom. interindustrial,Man-made filaments; strip and the l
+CHN,55,0,64305.458,64305.458,0,predom. interindustrial,Man-made staple fibres
+CHN,56,0,18763.158,18763.158,0,predom. interindustrial,"Wadding, felt and nonwovens, specia"
+CHN,57,0,3790.559,3790.559,0,predom. interindustrial,Carpets and other textile floor cov
+CHN,58,0,9833.927,9833.927,0,predom. interindustrial,"Fabrics; special woven fabrics, tuf"
+CHN,59,0,30031.305,30031.305,0,predom. interindustrial,"Textile fabrics; impregnated, coate"
+CHN,60,0,129456.887,129456.887,0,predom. interindustrial,Fabrics; knitted or crocheted
+CHN,61,0,60811.281,60811.281,0,predom. interindustrial,Apparel and clothing accessories; k
+CHN,62,0,98614.897,98614.897,0,predom. interindustrial,Apparel and clothing accessories; n
+CHN,63,0,45984.799,45984.799,0,predom. interindustrial,"Textiles, made up articles; sets; w"
+CHN,64,0,115797.466,115797.466,0,predom. interindustrial,Footwear; gaiters and the like; par
+CHN,65,0,16411.441,16411.441,0,predom. interindustrial,Headgear and parts thereof
+CHN,66,0,8782.082,8782.082,0,predom. interindustrial,"Umbrellas, sun umbrellas, walking-s"
+CHN,67,0,6462.47,6462.47,0,predom. interindustrial,"Feathers and down, prepared; and ar"
+CHN,68,0,41335.542,41335.542,0,predom. interindustrial,"Stone, plaster, cement, asbestos, m"
+CHN,69,0,31477.571,31477.571,0,predom. interindustrial,Ceramic products
+CHN,70,0,50896.027,50896.027,0,predom. interindustrial,Glass and glassware
+CHN,71,0,13090.035,13090.035,0,predom. interindustrial,"Natural, cultured pearls; precious,"
+CHN,72,0,91452.116,91452.116,0,predom. interindustrial,Iron and steel
+CHN,73,2772.758,318811.519,321584.27699999994,0.017244362976116312,predom. interindustrial,Iron or steel articles
+CHN,74,0,44020.284,44020.284,0,predom. interindustrial,Copper and articles thereof
+CHN,75,0,2936.822,2936.822,0,predom. interindustrial,Nickel and articles thereof
+CHN,76,0,70176.062,70176.062,0,predom. interindustrial,Aluminium and articles thereof
+CHN,78,0,2.297,2.297,0,predom. interindustrial,Lead and articles thereof
+CHN,79,0,1238.582,1238.582,0,predom. interindustrial,Zinc and articles thereof
+CHN,80,0,157.7,157.7,0,predom. interindustrial,Tin; articles thereof
+CHN,81,0,12676.434,12676.434,0,predom. interindustrial,"Metals; n.e.c., cermets and article"
+CHN,82,0,95707.61,95707.61,0,predom. interindustrial,"Tools, implements, cutlery, spoons"
+CHN,83,0,88703.777,88703.777,0,predom. interindustrial,Metal; miscellaneous products of ba
+CHN,84,3681.818,2418597.51,2422279.3279999997,0.0030399615415451775,predom. interindustrial,Machinery and mechanical appliances
+CHN,85,277.799,2876259.752,2876537.551,1.9314818254578814e-4,predom. interindustrial,Electrical machinery and equipment
+CHN,86,0,14756.682,14756.682,0,predom. interindustrial,"Railway, tramway locomotives, rolli"
+CHN,87,0.854,708947.651,708948.505,2.4092017798515997e-6,predom. interindustrial,Vehicles; other than railway or tra
+CHN,88,0,18696.714,18696.714,0,predom. interindustrial,"Aircraft, spacecraft, and parts the"
+CHN,89,0,33101.057,33101.057,0,predom. interindustrial,"Ships, boats and floating structure"
+CHN,90,15.625,340259.307,340274.932,9.183750274033287e-5,predom. interindustrial,"Optical, photographic, cinematograp"
+CHN,91,0,13291.921,13291.921,0,predom. interindustrial,Clocks and watches and parts thereo
+CHN,92,0,9752.298,9752.298,0,predom. interindustrial,Musical instruments; parts and acce
+CHN,93,0,2688.785,2688.785,0,predom. interindustrial,Arms and ammunition; parts and acce
+CHN,94,0,187453.829,187453.829,0,predom. interindustrial,"Furniture; bedding, mattresses, mat"
+CHN,95,0,203070.651,203070.651,0,predom. interindustrial,"Toys, games and sports requisites;"
+CHN,96,0,92973.425,92973.425,0,predom. interindustrial,Miscellaneous manufactured articles
+CHN,97,0,8.113,8.113,0,predom. interindustrial,Works of art; collectors' pieces an

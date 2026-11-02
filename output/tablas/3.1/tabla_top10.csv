@@ -1,0 +1,21 @@
+Socio,Capitulo,Descripcion,X (MUSD),M (MUSD),X+M (MUSD),% comercio bilateral,GL_i,tipo
+BRA,87,Vehicles; other than railway or tra,6000.4,5114.6,11115,40,0.92,predom. intraindustrial
+BRA,84,Machinery and mechanical appliances,552.9,1421.8,1974.7,7.1,0.56,predom. intraindustrial
+BRA,10,Cereals,1461.2,21.8,1483,5.3,0.029,predom. interindustrial
+BRA,27,"Mineral fuels, mineral oils and pro",1025.6,286.4,1312,4.7,0.437,predom. interindustrial
+BRA,39,Plastics and articles thereof,485.7,769.7,1255.4,4.5,0.774,predom. intraindustrial
+BRA,85,Electrical machinery and equipment,41.3,691.1,732.4,2.6,0.113,predom. interindustrial
+BRA,72,Iron and steel,60.8,617.9,678.7,2.4,0.179,predom. interindustrial
+BRA,04,Dairy produce; birds' eggs; natural,628,3.9,632,2.3,0.012,predom. interindustrial
+BRA,26,"Ores, slag and ash",0,572.9,572.9,2.1,0,predom. interindustrial
+BRA,40,Rubber and articles thereof,142.1,411,553.1,2,0.514,predom. intraindustrial
+CHN,85,Electrical machinery and equipment,0.3,2876.3,2876.5,16.5,0,predom. interindustrial
+CHN,84,Machinery and mechanical appliances,3.7,2418.6,2422.3,13.9,0.003,predom. interindustrial
+CHN,12,Oil seeds and oleaginous fruits; mi,1767.2,6.1,1773.3,10.2,0.007,predom. interindustrial
+CHN,02,Meat and edible meat offal,1608.9,0,1608.9,9.2,0,predom. interindustrial
+CHN,29,Organic chemicals,6,1261,1267.1,7.3,0.01,predom. interindustrial
+CHN,87,Vehicles; other than railway or tra,0,708.9,708.9,4.1,0,predom. interindustrial
+CHN,10,Cereals,595.5,0,595.5,3.4,0,predom. interindustrial
+CHN,28,Inorganic chemicals; organic and in,447.5,118.9,566.4,3.3,0.42,predom. interindustrial
+CHN,39,Plastics and articles thereof,6.3,529.6,535.9,3.1,0.023,predom. interindustrial
+CHN,15,"Animal, vegetable or microbial fats",481.3,0.9,482.2,2.8,0.004,predom. interindustrial
